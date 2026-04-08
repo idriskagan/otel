@@ -1,13 +1,13 @@
-package com.yazmuh.otel;
+package com.yazmuh.starter;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class OtelApplication {
+public class OtelApplicationStarter {
 
 	public static void main(String[] args) {
-		SpringApplication.run(OtelApplication.class, args);
+		SpringApplication.run(OtelApplicationStarter.class, args);
 	}
 
 }
