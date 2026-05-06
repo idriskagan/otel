@@ -35,7 +35,7 @@ class AuthUnitTestCase(unittest.TestCase):
 
     def test_kayit_olma_endpointi(self):
         """OTEL-14: /register API'sine veri gönderildiğinde yanıt dönme testi."""
-        response = self.client.post('/register', data={
+        response = self.client.post('/auth/register', data={
             'username': 'yeni_kullanici',
             'email': 'yeni@mail.com',
             'password': 'password123'
