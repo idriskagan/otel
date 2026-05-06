@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}StayFinder — Hayalinizdeki Oteli Bulun{% endblock %}
+
+{% block content %}
+<section class="hero" id="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <h1 class="hero-title">Hayalinizdeki Oteli <span class="highlight">Keşfedin</span></h1>
+        <p class="hero-subtitle">Türkiye'nin dört bir yanındaki en uygun otelleri karşılaştırın ve kolayca rezervasyon yapın.</p>
+
+        <form class="hero-search" action="{{ url_for('hotel.list_hotels') }}" method="GET" id="hero-search-form">
+            <div class="search-group">
+                <label for="search-city">Şehir</label>
+                <input type="text" id="search-city" name="city" placeholder="Nereye gitmek istiyorsunuz?">
+            </div>
+            <div class="search-group">
+                <label for="search-checkin">Giriş Tarihi</label>
+                <input type="date" id="search-checkin" name="check_in">
+            </div>
+            <div class="search-group">
+                <label for="search-checkout">Çıkış Tarihi</label>
+                <input type="date" id="search-checkout" name="check_out">
+            </div>
+            <div class="search-group">
+                <label for="search-guests">Misafir</label>
+                <select id="search-guests" name="guests">
+                    <option value="1">1 Misafir</option>
+                    <option value="2" selected>2 Misafir</option>
+                    <option value="3">3 Misafir</option>
+                    <option value="4">4+ Misafir</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-search" id="btn-search">Otel Ara</button>
+        </form>
+    </div>
+</section>
+
+<section class="section stats-section" id="stats-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-number">500+</span>
+                <span class="stat-label">Kayıtlı Otel</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">81</span>
+                <span class="stat-label">Şehir</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">10K+</span>
+                <span class="stat-label">Mutlu Misafir</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">4.8</span>
+                <span class="stat-label">Ortalama Puan</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="popular-cities">
+    <div class="container">
+        <h2 class="section-title">Popüler Şehirler</h2>
+        <p class="section-subtitle">En çok tercih edilen tatil destinasyonları</p>
+        <div class="cities-grid">
+            <div class="city-card">
+                <div class="city-card-overlay"></div>
+                <h3>İstanbul</h3>
+                <p>120+ Otel</p>
+            </div>
+            <div class="city-card">
+                <div class="city-card-overlay"></div>
+                <h3>Antalya</h3>
+                <p>95+ Otel</p>
+            </div>
+            <div class="city-card">
+                <div class="city-card-overlay"></div>
+                <h3>İzmir</h3>
+                <p>60+ Otel</p>
+            </div>
+            <div class="city-card">
+                <div class="city-card-overlay"></div>
+                <h3>Muğla</h3>
+                <p>80+ Otel</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

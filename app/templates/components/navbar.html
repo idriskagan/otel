@@ -1,0 +1,25 @@
+<nav class="navbar" id="main-navbar">
+    <div class="navbar-container">
+        <a href="{{ url_for('main.index') }}" class="navbar-brand">
+            <span class="brand-icon">🏨</span>
+            <span class="brand-text">StayFinder</span>
+        </a>
+
+        <button class="navbar-toggle" id="navbar-toggle" aria-label="Menüyü aç">
+            <span class="toggle-bar"></span>
+            <span class="toggle-bar"></span>
+            <span class="toggle-bar"></span>
+        </button>
+
+        <ul class="navbar-menu" id="navbar-menu">
+            <li><a href="{{ url_for('main.index') }}" class="nav-link">Ana Sayfa</a></li>
+            <li><a href="{{ url_for('hotel.list_hotels') }}" class="nav-link">Oteller</a></li>
+            <li><a href="{{ url_for('main.about') }}" class="nav-link">Hakkında</a></li>
+        </ul>
+
+        <div class="navbar-auth" id="navbar-auth">
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Giriş Yap</a>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Kayıt Ol</a>
+        </div>
+    </div>
+</nav>

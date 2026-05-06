@@ -1,0 +1,14 @@
+<!-- Otel kartı bileşeni — EPIC-5'te tam tasarım yapılacak -->
+<div class="hotel-card" id="hotel-card-{{ hotel.id }}">
+    <div class="hotel-card-image">
+        <img src="{{ hotel.primary_image or url_for('static', filename='images/placeholder.jpg') }}" alt="{{ hotel.name }}">
+    </div>
+    <div class="hotel-card-body">
+        <h3 class="hotel-card-title">{{ hotel.name }}</h3>
+        <p class="hotel-card-city">📍 {{ hotel.city }}</p>
+        <div class="hotel-card-stars">
+            {% for i in range(hotel.star_rating) %}⭐{% endfor %}
+        </div>
+        <p class="hotel-card-price">₺{{ hotel.price_min }} — ₺{{ hotel.price_max }} / gece</p>
+    </div>
+</div>

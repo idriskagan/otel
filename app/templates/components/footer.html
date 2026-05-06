@@ -1,0 +1,23 @@
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-brand">
+            <span class="brand-icon">🏨</span>
+            <span class="brand-text">StayFinder</span>
+            <p class="footer-tagline">En uygun otelleri keşfedin.</p>
+        </div>
+        <div class="footer-links">
+            <h4>Hızlı Linkler</h4>
+            <a href="{{ url_for('main.index') }}">Ana Sayfa</a>
+            <a href="{{ url_for('hotel.list_hotels') }}">Oteller</a>
+            <a href="{{ url_for('main.about') }}">Hakkında</a>
+        </div>
+        <div class="footer-links">
+            <h4>Hesap</h4>
+            <a href="{{ url_for('auth.login') }}">Giriş Yap</a>
+            <a href="{{ url_for('auth.register') }}">Kayıt Ol</a>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 StayFinder. Tüm hakları saklıdır.</p>
+        </div>
+    </div>
+</footer>
