@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Giriş Yap — StayFinder{% endblock %}
+
+{% block content %}
+<section class="section auth-section">
+    <div class="container auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2>Hoş Geldiniz</h2>
+                <p>Hesabınıza giriş yaparak rezervasyonlarınızı yönetin.</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('auth.login') }}" class="auth-form">
+                {{ form.csrf_token }}
+                
+                <div class="form-group">
+                    {{ form.email.label }}
+                    {{ form.email(class="form-control", placeholder="ornek@email.com") }}
+                    {% if form.email.errors %}
+                        <div class="form-error">
+                            {% for error in form.email.errors %}<span>{{ error }}</span>{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.password.label }}
+                    {{ form.password(class="form-control", placeholder="Şifreniz") }}
+                    {% if form.password.errors %}
+                        <div class="form-error">
+                            {% for error in form.password.errors %}<span>{{ error }}</span>{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group form-check">
+                    {{ form.remember() }}
+                    {{ form.remember.label }}
+                </div>
+
+                <div class="form-submit">
+                    {{ form.submit(class="btn btn-primary btn-block") }}
+                </div>
+            </form>
+
+            <div class="auth-footer">
+                <p>Hesabınız yok mu? <a href="{{ url_for('auth.register') }}">Hemen Kayıt Olun</a></p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

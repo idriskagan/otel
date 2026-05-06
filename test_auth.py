@@ -4,22 +4,19 @@ from app.models.user import User
 
 class AuthUnitTestCase(unittest.TestCase):
     def setUp(self):
-        # 1. Test için yalıtılmış uygulama ve veritabanı kuruyoruz
         self.app = create_app()
+        # Testler sırasında form güvenliğinin (CSRF) bizi engellemesini durduruyoruz
+        self.app.config['WTF_CSRF_ENABLED'] = False 
         self.app.config['TESTING'] = True
-        self.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:' 
-        
         self.client = self.app.test_client()
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        
-        db.create_all()
+        with self.app.app_context():
+         # Veritabanını her testten önce sıfırdan oluşturur
+         db.create_all()
 
     def tearDown(self):
-        # 2. Test bitince ortalığı temizliyoruz
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+        with self.app.app_context(): # Bu satırı ekleyerek context içine alıyoruz
+            db.session.remove()
+            db.drop_all()
 
     def test_sifre_guvenligi_hashleme(self):
         """OTEL-14: Şifrelerin açık metin yerine hashlenerek kaydedildiğinin testi."""
@@ -37,12 +34,14 @@ class AuthUnitTestCase(unittest.TestCase):
         """OTEL-14: /register API'sine veri gönderildiğinde yanıt dönme testi."""
         response = self.client.post('/auth/register', data={
             'username': 'yeni_kullanici',
-            'email': 'yeni@mail.com',
-            'password': 'password123'
-        })
+            'email': 'test@example.com',
+            'password': 'Sifre123!',
+            'confirm_password': 'Sifre123!',
+            'role': 'user',    # İşte bu eksik olan parçaydı!
+            'submit': True
+        }, follow_redirects=True)
         
-        # Kağan henüz API kodunu tam yazmadığı için bu test şimdilik geçemeyecek (Fail olacak)!
-        self.assertIn(response.status_code, [200, 201, 302]) 
-
+        # 400 hatasından kurtulup 200 veya 302 görmeyi bekliyoruz
+        self.assertIn(response.status_code, [200, 201, 302])
 if __name__ == '__main__':
     unittest.main(verbosity=2)
