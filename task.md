@@ -6,67 +6,67 @@
 
 ---
 
-## EPIC-1: Proje Altyapısı ve Konfigürasyon 🔵
-**Tag:** `v0.1.0` | **Branch:** `feature/OTEL-epic-1-infrastructure`
+## ~~EPIC-1: Proje Altyapısı ve Konfigürasyon~~ ✅ TAMAMLANDI
+**Tag:** `v0.1.0` | **Branch:** `development`
 
 ### OTEL-1: Proje İskeleti Oluşturma
-- `[ ]` **OTEL-1.1** Virtual environment oluştur (`python -m venv venv`)
-- `[ ]` **OTEL-1.2** `requirements.txt` oluştur (Flask, SQLAlchemy, Migrate, Login, WTF, dotenv, Pillow)
-- `[ ]` **OTEL-1.3** Bağımlılıkları yükle (`pip install -r requirements.txt`)
-- `[ ]` **OTEL-1.4** `.gitignore` ve `.env` dosyalarını oluştur
-> **Kabul Kriteri:** `pip freeze` ile tüm paketler yüklü görünmeli
+- `[x]` **OTEL-1.1** Virtual environment oluştur (`python -m venv venv`)
+- `[x]` **OTEL-1.2** `requirements.txt` oluştur (Flask, SQLAlchemy, Migrate, Login, WTF, dotenv, Pillow)
+- `[x]` **OTEL-1.3** Bağımlılıkları yükle (`pip install -r requirements.txt`)
+- `[x]` **OTEL-1.4** `.gitignore` ve `.env` dosyalarını oluştur
+> ✅ **Kabul Kriteri:** `pip freeze` ile tüm paketler yüklü görünmeli
 
 ### OTEL-2: Flask Application Factory
-- `[ ]` **OTEL-2.1** `app/__init__.py` — create_app() factory fonksiyonu
-- `[ ]` **OTEL-2.2** `app/config.py` — Dev/Prod/Test konfigürasyon sınıfları
-- `[ ]` **OTEL-2.3** `app/extensions.py` — db, migrate, login_manager init
-- `[ ]` **OTEL-2.4** `run.py` — Entry point
-> **Kabul Kriteri:** `flask run` ile uygulama başlamalı, 200 OK dönmeli
+- `[x]` **OTEL-2.1** `app/__init__.py` — create_app() factory fonksiyonu
+- `[x]` **OTEL-2.2** `app/config.py` — Dev/Prod/Test konfigürasyon sınıfları
+- `[x]` **OTEL-2.3** `app/extensions.py` — db, migrate, login_manager init
+- `[x]` **OTEL-2.4** `run.py` — Entry point
+> ✅ **Kabul Kriteri:** `flask run` ile uygulama başladı, 200 OK döndü
 
 ### OTEL-3: Temel Dizin Yapısı
-- `[ ]` **OTEL-3.1** `models/`, `repositories/`, `services/`, `routes/`, `forms/`, `utils/` klasörleri + `__init__.py`
-- `[ ]` **OTEL-3.2** `templates/` ve `static/` klasör yapısı
-- `[ ]` **OTEL-3.3** Minimal `base.html` template + `style.css` placeholder
-- `[ ]` **OTEL-3.4** `README.md` oluştur
-> **Kabul Kriteri:** Tüm klasörler mevcut, import hataları yok
+- `[x]` **OTEL-3.1** `models/`, `repositories/`, `services/`, `routes/`, `forms/`, `utils/` klasörleri + `__init__.py`
+- `[x]` **OTEL-3.2** `templates/` ve `static/` klasör yapısı
+- `[x]` **OTEL-3.3** Minimal `base.html` template + `style.css` placeholder
+- `[x]` **OTEL-3.4** `README.md` oluştur
+> ✅ **Kabul Kriteri:** Tüm klasörler mevcut, import hataları yok
 
-🔖 **Commit:** `[OTEL-3] Proje altyapısı tamamlandı` → **Push & Tag v0.1.0**
+🔖 **Commit:** `[OTEL-3] Proje altyapısı tamamlandı` → **Push & Tag v0.1.0** ✅
 
 ---
 
-## EPIC-2: Data Layer — Modeller ve Repository 🟢
-**Tag:** `v0.2.0` | **Branch:** `feature/OTEL-epic-2-data-layer`
+## ~~EPIC-2: Data Layer — Modeller ve Repository~~ ✅ TAMAMLANDI
+**Tag:** `v0.2.0` | **Branch:** `development`
 
 ### OTEL-4: SQLAlchemy Modelleri
-- `[ ]` **OTEL-4.1** `models/user.py` — User modeli (UserMixin, password hash/check)
-- `[ ]` **OTEL-4.2** `models/hotel.py` — Hotel + HotelImage modelleri
-- `[ ]` **OTEL-4.3** `models/room.py` — RoomType modeli
-- `[ ]` **OTEL-4.4** `models/amenity.py` — Amenity + hotel_amenities M2M tablosu
-- `[ ]` **OTEL-4.5** `models/reservation.py` — Reservation modeli
-- `[ ]` **OTEL-4.6** `models/review.py` — Review modeli
-- `[ ]` **OTEL-4.7** `models/__init__.py` — Tüm modelleri export et
-> **Kabul Kriteri:** `flask db migrate` hatasız çalışmalı
+- `[x]` **OTEL-4.1** `models/user.py` — User modeli (UserMixin, password hash/check)
+- `[x]` **OTEL-4.2** `models/hotel.py` — Hotel + HotelImage modelleri
+- `[x]` **OTEL-4.3** `models/room.py` — RoomType modeli
+- `[x]` **OTEL-4.4** `models/amenity.py` — Amenity + hotel_amenities M2M tablosu
+- `[x]` **OTEL-4.5** `models/reservation.py` — Reservation modeli
+- `[x]` **OTEL-4.6** `models/review.py` — Review modeli
+- `[x]` **OTEL-4.7** `models/__init__.py` — Tüm modelleri export et
+> ✅ **Kabul Kriteri:** `flask db migrate` hatasız çalıştı
 
 ### OTEL-5: Base Repository Pattern
-- `[ ]` **OTEL-5.1** `repositories/base_repository.py` — Generic CRUD (get_by_id, get_all, create, update, delete, paginate)
-> **Kabul Kriteri:** BaseRepository tüm modellerde kullanılabilir olmalı
+- `[x]` **OTEL-5.1** `repositories/base_repository.py` — Generic CRUD (get_by_id, get_all, create, update, delete, paginate)
+> ✅ **Kabul Kriteri:** BaseRepository tüm modellerde kullanılabilir durumda
 
 ### OTEL-6: Entity Repository'leri
-- `[ ]` **OTEL-6.1** `repositories/user_repository.py` — get_by_email, get_by_username, get_by_role
-- `[ ]` **OTEL-6.2** `repositories/hotel_repository.py` — search, filter_by_city, filter_by_stars, get_approved, get_by_owner
-- `[ ]` **OTEL-6.3** `repositories/room_repository.py` — get_by_hotel, check_availability
-- `[ ]` **OTEL-6.4** `repositories/amenity_repository.py` — get_all, get_by_category
-- `[ ]` **OTEL-6.5** `repositories/reservation_repository.py` — get_by_user, get_by_hotel, get_conflicts
-- `[ ]` **OTEL-6.6** `repositories/review_repository.py` — get_by_hotel, get_average_rating
-> **Kabul Kriteri:** Her repository BaseRepository'den türemeli, özel sorgular çalışmalı
+- `[x]` **OTEL-6.1** `repositories/user_repository.py` — get_by_email, get_by_username, get_by_role
+- `[x]` **OTEL-6.2** `repositories/hotel_repository.py` — search, filter_by_city, filter_by_stars, get_approved, get_by_owner
+- `[x]` **OTEL-6.3** `repositories/room_repository.py` — get_by_hotel, check_availability
+- `[x]` **OTEL-6.4** `repositories/amenity_repository.py` — get_all, get_by_category
+- `[x]` **OTEL-6.5** `repositories/reservation_repository.py` — get_by_user, get_by_hotel, get_conflicts
+- `[x]` **OTEL-6.6** `repositories/review_repository.py` — get_by_hotel, get_average_rating
+> ✅ **Kabul Kriteri:** Her repository BaseRepository'den türetildi, özel sorgular yazıldı
 
 ### OTEL-7: Migration ve Seed Data
-- `[ ]` **OTEL-7.1** `flask db init` + `flask db migrate` + `flask db upgrade`
-- `[ ]` **OTEL-7.2** `seed.py` — Admin kullanıcı, örnek amenity'ler, 3-5 örnek otel
-- `[ ]` **OTEL-7.3** Seed script'i çalıştır ve doğrula
-> **Kabul Kriteri:** DB oluşmalı, seed data yüklenmeli, ilişkiler doğru çalışmalı
+- `[x]` **OTEL-7.1** `flask db init` + `flask db migrate` + `flask db upgrade`
+- `[x]` **OTEL-7.2** `seed.py` — Admin kullanıcı, örnek amenity'ler, 3-5 örnek otel
+- `[x]` **OTEL-7.3** Seed script'i çalıştır ve doğrula
+> ✅ **Kabul Kriteri:** DB oluştu, seed data başarıyla yüklendi
 
-🔖 **Commit:** `[OTEL-7] Data layer tamamlandı` → **Push & Tag v0.2.0**
+🔖 **Commit:** `[OTEL-7] Data layer tamamlandı` → **Push & Tag v0.2.0** ✅
 
 ---
 
