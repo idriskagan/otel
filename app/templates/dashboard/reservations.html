@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Rezervasyonlarım — StayFinder{% endblock %}
+
+{% block content %}
+<div class="page-header" style="text-align: left; background: var(--bg-card); padding-bottom: var(--space-8);">
+    <div class="container">
+        <h1>Hoş Geldin, {{ current_user.username }}</h1>
+        <p>Kullanıcı Paneli</p>
+    </div>
+</div>
+
+<section class="section" style="padding-top: var(--space-8);">
+    <div class="container" style="display: grid; grid-template-columns: 250px 1fr; gap: var(--space-8);">
+        
+        <!-- Sidebar -->
+        <aside style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: var(--space-4); height: fit-content;">
+            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-2);">
+                <li>
+                    <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline" style="width: 100%; justify-content: flex-start; text-align: left; border: none;">
+                        Profilim
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('dashboard.reservations') }}" class="btn btn-primary" style="width: 100%; justify-content: flex-start; text-align: left;">
+                        Rezervasyonlarım
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- İçerik -->
+        <div style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: var(--space-8);">
+            <h2 style="margin-bottom: var(--space-6);">Rezervasyonlarım</h2>
+            
+            <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+                {% for res in reservations %}
+                    <div style="border: 1px solid var(--border); padding: var(--space-6); border-radius: var(--radius-lg); display: flex; flex-direction: column; gap: var(--space-4);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border); padding-bottom: var(--space-4);">
+                            <div>
+                                <h3 style="color: var(--text-heading); font-size: var(--font-xl); margin-bottom: var(--space-1);">{{ res.hotel.name }}</h3>
+                                <p style="color: var(--text-muted); font-size: var(--font-sm);">{{ res.hotel.city }} | {{ res.room_type.name }}</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <span style="display: inline-block; padding: var(--space-1) var(--space-3); border-radius: var(--radius-sm); font-size: var(--font-xs); font-weight: bold; text-transform: uppercase; 
+                                    {% if res.status == 'pending' %}background: rgba(245, 158, 11, 0.2); color: var(--warning);
+                                    {% elif res.status == 'confirmed' %}background: rgba(16, 185, 129, 0.2); color: var(--success);
+                                    {% else %}background: rgba(239, 68, 68, 0.2); color: var(--danger);{% endif %}">
+                                    {{ res.status }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4);">
+                            <div>
+                                <label style="color: var(--text-muted); font-size: var(--font-xs); text-transform: uppercase;">Giriş</label>
+                                <p style="font-weight: 600;">{{ res.check_in.strftime('%d.%m.%Y') }}</p>
+                            </div>
+                            <div>
+                                <label style="color: var(--text-muted); font-size: var(--font-xs); text-transform: uppercase;">Çıkış</label>
+                                <p style="font-weight: 600;">{{ res.check_out.strftime('%d.%m.%Y') }}</p>
+                            </div>
+                            <div>
+                                <label style="color: var(--text-muted); font-size: var(--font-xs); text-transform: uppercase;">Misafir</label>
+                                <p style="font-weight: 600;">{{ res.guests }} Kişi</p>
+                            </div>
+                            <div>
+                                <label style="color: var(--text-muted); font-size: var(--font-xs); text-transform: uppercase;">Toplam Tutar</label>
+                                <p style="font-weight: 600; color: var(--primary-light);">{{ res.total_price }} ₺</p>
+                            </div>
+                        </div>
+
+                        {% if res.status != 'cancelled' %}
+                            <div style="display: flex; justify-content: flex-end; margin-top: var(--space-2);">
+                                <form action="{{ url_for('dashboard.cancel_reservation', reservation_id=res.id) }}" method="POST" onsubmit="return confirm('Bu rezervasyonu iptal etmek istediğinize emin misiniz?');">
+                                    <button type="submit" class="btn btn-outline" style="color: var(--danger); border-color: var(--danger);">İptal Et</button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div style="text-align: center; padding: var(--space-8); background: rgba(15, 23, 42, 0.5); border-radius: var(--radius-lg);">
+                        <p class="text-muted">Henüz hiç rezervasyonunuz bulunmuyor.</p>
+                        <a href="{{ url_for('hotel.list_hotels') }}" class="btn btn-primary" style="margin-top: var(--space-4);">Otelleri Keşfet</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

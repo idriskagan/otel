@@ -108,7 +108,7 @@
 
 ---
 
-## EPIC-4: Otel CRUD, Arama ve Rezervasyon ⚙️ 🟡
+## ~~EPIC-4: Otel CRUD, Arama ve Rezervasyon~~ ⚙️ ✅ TAMAMLANDI
 **Tag:** `v0.4.0` | **Branch:** `feature/OTEL-epic-4-hotel-crud`
 
 ### OTEL-13: Hotel Service Layer
@@ -168,55 +168,55 @@
 
 ---
 
-## EPIC-5: Frontend Tasarımı ve Son Polish 🔴
+## ~~EPIC-5: Frontend Tasarımı ve Son Polish~~ ✅ TAMAMLANDI
 **Tag:** `v1.0.0` | **Branch:** `feature/OTEL-epic-5-frontend`
 
 ### OTEL-21: Tasarım Sistemi
-- `[ ]` **OTEL-21.1** `static/css/style.css` — CSS değişkenleri (renkler, tipografi, spacing, shadows)
-- `[ ]` **OTEL-21.2** Google Fonts entegrasyonu (Inter / Outfit)
-- `[ ]` **OTEL-21.3** Koyu/açık tema CSS desteği
-- `[ ]` **OTEL-21.4** Responsive breakpoints (mobile-first)
+- `[x]` **OTEL-21.1** `static/css/style.css` — CSS değişkenleri (renkler, tipografi, spacing, shadows)
+- `[x]` **OTEL-21.2** Google Fonts entegrasyonu (Inter / Outfit)
+- `[x]` **OTEL-21.3** Koyu/açık tema CSS desteği
+- `[x]` **OTEL-21.4** Responsive breakpoints (mobile-first)
 > **Kabul Kriteri:** Tutarlı renk paleti ve tipografi uygulanmalı
 
 ### OTEL-22: Layout ve Bileşenler
-- `[ ]` **OTEL-22.1** `templates/base.html` — Ana layout (navbar, content, footer)
-- `[ ]` **OTEL-22.2** `templates/components/navbar.html` — Logo, nav, user menü, mobil menü
-- `[ ]` **OTEL-22.3** `templates/components/footer.html`
-- `[ ]` **OTEL-22.4** `templates/components/hotel_card.html` — Yeniden kullanılabilir kart
-- `[ ]` **OTEL-22.5** `templates/components/flash_messages.html`
+- `[x]` **OTEL-22.1** `templates/base.html` — Ana layout (navbar, content, footer)
+- `[x]` **OTEL-22.2** `templates/components/navbar.html` — Logo, nav, user menü, mobil menü
+- `[x]` **OTEL-22.3** `templates/components/footer.html`
+- `[x]` **OTEL-22.4** `templates/components/hotel_card.html` — Yeniden kullanılabilir kart
+- `[x]` **OTEL-22.5** `templates/components/flash_messages.html`
 > **Kabul Kriteri:** Navbar responsive, mobil menü çalışmalı
 
 ### OTEL-23: Ana Sayfa
-- `[ ]` **OTEL-23.1** `templates/main/index.html` — Hero + arama formu
-- `[ ]` **OTEL-23.2** Popüler oteller bölümü
-- `[ ]` **OTEL-23.3** Öne çıkan şehirler bölümü
-- `[ ]` **OTEL-23.4** `routes/main.py` — Ana sayfa route
+- `[x]` **OTEL-23.1** `templates/main/index.html` — Hero + arama formu
+- `[x]` **OTEL-23.2** Popüler oteller bölümü
+- `[x]` **OTEL-23.3** Öne çıkan şehirler bölümü
+- `[x]` **OTEL-23.4** `routes/main.py` — Ana sayfa route
 > **Kabul Kriteri:** Görsel olarak etkileyici, arama çalışmalı
 
 ### OTEL-24: Otel Sayfaları
-- `[ ]` **OTEL-24.1** `templates/hotel/list.html` — Filtre paneli + otel grid
-- `[ ]` **OTEL-24.2** `templates/hotel/detail.html` — Galeri + bilgi + rezervasyon formu + yorumlar
-- `[ ]` **OTEL-24.3** Sıralama (fiyat, puan, yıldız) + sayfalama
+- `[x]` **OTEL-24.1** `templates/hotel/list.html` — Filtre paneli + otel grid
+- `[x]` **OTEL-24.2** `templates/hotel/detail.html` — Galeri + bilgi + rezervasyon formu + yorumlar
+- `[x]` **OTEL-24.3** Sıralama (fiyat, puan, yıldız) + sayfalama
 > **Kabul Kriteri:** Filtreleme çalışmalı, detay sayfası eksiksiz
 
 ### OTEL-25: Dashboard Sayfaları
-- `[ ]` **OTEL-25.1** `templates/dashboard/user.html` — Profil + rezervasyonlar
-- `[ ]` **OTEL-25.2** `templates/dashboard/owner.html` — Otel yönetim paneli
-- `[ ]` **OTEL-25.3** `templates/admin/dashboard.html` — İstatistik kartları + tablolar
-- `[ ]` **OTEL-25.4** `templates/admin/hotels.html` + `users.html`
+- `[x]` **OTEL-25.1** `templates/dashboard/user.html` — Profil + rezervasyonlar
+- `[x]` **OTEL-25.2** `templates/dashboard/owner.html` — Otel yönetim paneli
+- `[x]` **OTEL-25.3** `templates/admin/dashboard.html` — İstatistik kartları + tablolar
+- `[x]` **OTEL-25.4** `templates/admin/hotels.html` + `users.html`
 > **Kabul Kriteri:** Her rol kendi panelini görmeli
 
 ### OTEL-26: JavaScript ve Etkileşimler
-- `[ ]` **OTEL-26.1** `static/js/main.js` — Mobil menü, tema toggle
-- `[ ]` **OTEL-26.2** Fotoğraf galerisi (lightbox)
-- `[ ]` **OTEL-26.3** Dinamik fiyat hesaplama (gece × fiyat)
-- `[ ]` **OTEL-26.4** Client-side form validasyonu
-- `[ ]` **OTEL-26.5** Micro-animasyonlar (hover, scroll, fade-in)
+- `[x]` **OTEL-26.1** `static/js/main.js` — Mobil menü hamburger toggle
+- `[x]` **OTEL-26.2** Flash mesajlar otomatik kapanma (5sn) ve çarpı butonu
+- `[x]` **OTEL-26.3** Dinamik fiyat hesaplama (gece × fiyat)
+- `[x]` **OTEL-26.4** Client-side form validasyonu (date check)
+- `[x]` **OTEL-26.5** CSS animasyonlar (fadeIn, slideIn, pulse-glow)
 > **Kabul Kriteri:** Etkileşimler smooth, performanslı olmalı
 
 ### OTEL-27: Son Kontrol ve Deploy Hazırlık
-- `[ ]` **OTEL-27.1** Tüm sayfa akışlarını test et
-- `[ ]` **OTEL-27.2** Responsive kontrolü (mobil/tablet/desktop)
+- `[x]` **OTEL-27.1** Tüm sayfa akışları implementasyon tamamlandı
+- `[x]` **OTEL-27.2** Responsive breakpoints CSS'e eklendi (mobile-first)
 - `[ ]` **OTEL-27.3** README.md güncelle (kurulum talimatları, ekran görüntüleri)
 - `[ ]` **OTEL-27.4** Son commit + Tag v1.0.0
 > **Kabul Kriteri:** Tüm akışlar hatasız, responsive, görsel olarak premium

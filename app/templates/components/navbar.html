@@ -14,12 +14,24 @@
         <ul class="navbar-menu" id="navbar-menu">
             <li><a href="{{ url_for('main.index') }}" class="nav-link">Ana Sayfa</a></li>
             <li><a href="{{ url_for('hotel.list_hotels') }}" class="nav-link">Oteller</a></li>
-            <li><a href="{{ url_for('main.about') }}" class="nav-link">Hakkında</a></li>
+            {% if current_user.is_authenticated %}
+                {% if current_user.role == 'admin' %}
+                    <li><a href="{{ url_for('admin.dashboard') }}" class="nav-link">Admin Paneli</a></li>
+                {% elif current_user.role == 'hotel_owner' %}
+                    <li><a href="{{ url_for('hotel_owner.dashboard') }}" class="nav-link">Otel Paneli</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('dashboard.index') }}" class="nav-link">Profilim</a></li>
+            {% endif %}
         </ul>
 
         <div class="navbar-auth" id="navbar-auth">
-            <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Giriş Yap</a>
-            <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Kayıt Ol</a>
+            {% if current_user.is_authenticated %}
+                <span class="nav-link" style="margin-right: 1rem; font-weight: 600;">{{ current_user.username }}</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-outline">Çıkış Yap</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Giriş Yap</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Kayıt Ol</a>
+            {% endif %}
         </div>
     </div>
 </nav>
