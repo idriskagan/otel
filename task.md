@@ -70,98 +70,98 @@
 
 ---
 
-## EPIC-3: Auth Sistemi — Service + Presentation 🟡
+## ~~EPIC-3: Auth Sistemi — Service + Presentation~~ ✅ TAMAMLANDI
 **Tag:** `v0.3.0` | **Branch:** `feature/OTEL-epic-3-auth`
 
 ### OTEL-8: Auth Service Layer
-- `[ ]` **OTEL-8.1** `services/auth_service.py` — register_user(data): validasyon + hash + kayıt
-- `[ ]` **OTEL-8.2** `services/auth_service.py` — login_user(email, password): doğrulama
-- `[ ]` **OTEL-8.3** `services/auth_service.py` — Hata yönetimi (duplicate email, yanlış şifre)
+- `[x]` **OTEL-8.1** `services/auth_service.py` — register_user(data): validasyon + hash + kayıt
+- `[x]` **OTEL-8.2** `services/auth_service.py` — login_user(email, password): doğrulama
+- `[x]` **OTEL-8.3** `services/auth_service.py` — Hata yönetimi (duplicate email, yanlış şifre)
 > **Kabul Kriteri:** Service katmanı route'dan bağımsız test edilebilmeli
 
 ### OTEL-9: Auth Forms
-- `[ ]` **OTEL-9.1** `forms/auth_forms.py` — LoginForm (email, password, CSRF)
-- `[ ]` **OTEL-9.2** `forms/auth_forms.py` — RegisterForm (username, email, password, confirm, role)
+- `[x]` **OTEL-9.1** `forms/auth_forms.py` — LoginForm (email, password, CSRF)
+- `[x]` **OTEL-9.2** `forms/auth_forms.py` — RegisterForm (username, email, password, confirm, role)
 > **Kabul Kriteri:** Validasyon kuralları (email format, min şifre uzunluğu) çalışmalı
 
 ### OTEL-10: Auth Routes (Presentation)
-- `[ ]` **OTEL-10.1** `routes/auth.py` — Blueprint tanımla
-- `[ ]` **OTEL-10.2** `GET/POST /login` — Giriş sayfası
-- `[ ]` **OTEL-10.3** `GET/POST /register` — Kayıt sayfası (kullanıcı/otel sahibi seçimi)
-- `[ ]` **OTEL-10.4** `GET /logout` — Çıkış
-- `[ ]` **OTEL-10.5** Flask-Login user_loader callback
+- `[x]` **OTEL-10.1** `routes/auth.py` — Blueprint tanımla
+- `[x]` **OTEL-10.2** `GET/POST /login` — Giriş sayfası
+- `[x]` **OTEL-10.3** `GET/POST /register` — Kayıt sayfası (kullanıcı/otel sahibi seçimi)
+- `[x]` **OTEL-10.4** `GET /logout` — Çıkış
+- `[x]` **OTEL-10.5** Flask-Login user_loader callback
 > **Kabul Kriteri:** Kayıt → Giriş → Çıkış akışı sorunsuz çalışmalı
 
 ### OTEL-11: Yetkilendirme Dekoratörleri
-- `[ ]` **OTEL-11.1** `utils/decorators.py` — `@role_required('admin')` dekoratörü
-- `[ ]` **OTEL-11.2** `utils/decorators.py` — `@hotel_owner_required` dekoratörü
-- `[ ]` **OTEL-11.3** Yetkisiz erişimde 403 sayfası
+- `[x]` **OTEL-11.1** `utils/decorators.py` — `@role_required('admin')` dekoratörü
+- `[x]` **OTEL-11.2** `utils/decorators.py` — `@hotel_owner_required` dekoratörü
+- `[x]` **OTEL-11.3** Yetkisiz erişimde 403 sayfası
 > **Kabul Kriteri:** Normal kullanıcı admin sayfasına erişememeli
 
 ### OTEL-12: Auth Templates
-- `[ ]` **OTEL-12.1** `templates/auth/login.html` — Login formu
-- `[ ]` **OTEL-12.2** `templates/auth/register.html` — Kayıt formu
-- `[ ]` **OTEL-12.3** Flash mesaj gösterimi (başarı/hata)
+- `[x]` **OTEL-12.1** `templates/auth/login.html` — Login formu
+- `[x]` **OTEL-12.2** `templates/auth/register.html` — Kayıt formu
+- `[x]` **OTEL-12.3** Flash mesaj gösterimi (başarı/hata)
 > **Kabul Kriteri:** Formlar responsive, validasyon hataları görünür
 
 🔖 **Commit:** `[OTEL-12] Auth sistemi tamamlandı` → **Push & Tag v0.3.0**
 
 ---
 
-## EPIC-4: Otel CRUD, Arama ve Rezervasyon ⚙️ 🟠
+## EPIC-4: Otel CRUD, Arama ve Rezervasyon ⚙️ 🟡
 **Tag:** `v0.4.0` | **Branch:** `feature/OTEL-epic-4-hotel-crud`
 
 ### OTEL-13: Hotel Service Layer
-- `[ ]` **OTEL-13.1** `services/hotel_service.py` — create_hotel (validasyon + kayıt)
-- `[ ]` **OTEL-13.2** `services/hotel_service.py` — update_hotel (sahiplik kontrolü)
-- `[ ]` **OTEL-13.3** `services/hotel_service.py` — search_hotels (şehir, yıldız, fiyat, amenity filtresi)
-- `[ ]` **OTEL-13.4** `services/hotel_service.py` — approve_hotel (admin)
-- `[ ]` **OTEL-13.5** `services/hotel_service.py` — upload_images (resize + kayıt)
+- `[x]` **OTEL-13.1** `services/hotel_service.py` — create_hotel (validasyon + kayıt)
+- `[x]` **OTEL-13.2** `services/hotel_service.py` — update_hotel (sahiplik kontrolü)
+- `[x]` **OTEL-13.3** `services/hotel_service.py` — search_hotels (şehir, yıldız, fiyat, amenity filtresi)
+- `[x]` **OTEL-13.4** `services/hotel_service.py` — approve_hotel (admin)
+- `[x]` **OTEL-13.5** `services/hotel_service.py` — upload_images (resize + kayıt)
 > **Kabul Kriteri:** İş kuralları service'te, DB işleri repository'de olmalı
 
 ### OTEL-14: Reservation Service Layer
-- `[ ]` **OTEL-14.1** `services/reservation_service.py` — create_reservation (müsaitlik + fiyat hesaplama)
-- `[ ]` **OTEL-14.2** `services/reservation_service.py` — cancel_reservation (durum kontrolü)
-- `[ ]` **OTEL-14.3** `services/reservation_service.py` — get_user_reservations
+- `[x]` **OTEL-14.1** `services/reservation_service.py` — create_reservation (müsaitlik + fiyat hesaplama)
+- `[x]` **OTEL-14.2** `services/reservation_service.py` — cancel_reservation (durum kontrolü)
+- `[x]` **OTEL-14.3** `services/reservation_service.py` — get_user_reservations
 > **Kabul Kriteri:** Tarih çakışması engellenmeli, fiyat doğru hesaplanmalı
 
 ### OTEL-15: Review Service Layer
-- `[ ]` **OTEL-15.1** `services/review_service.py` — add_review (tekrar yorum engelle)
-- `[ ]` **OTEL-15.2** `services/review_service.py` — get_hotel_reviews (sayfalama + ortalama puan)
+- `[x]` **OTEL-15.1** `services/review_service.py` — add_review (tekrar yorum engelle)
+- `[x]` **OTEL-15.2** `services/review_service.py` — get_hotel_reviews (sayfalama + ortalama puan)
 > **Kabul Kriteri:** Bir kullanıcı aynı otele 2 yorum yazamamalı
 
 ### OTEL-16: Hotel Forms
-- `[ ]` **OTEL-16.1** `forms/hotel_forms.py` — HotelForm (isim, şehir, yıldız, fiyat, açıklama...)
-- `[ ]` **OTEL-16.2** `forms/hotel_forms.py` — RoomTypeForm
-- `[ ]` **OTEL-16.3** `forms/reservation_forms.py` — ReservationForm (tarih, misafir)
+- `[x]` **OTEL-16.1** `forms/hotel_forms.py` — HotelForm (isim, şehir, yıldız, fiyat, açıklama...)
+- `[x]` **OTEL-16.2** `forms/hotel_forms.py` — RoomTypeForm
+- `[x]` **OTEL-16.3** `forms/reservation_forms.py` — ReservationForm (tarih, misafir)
 > **Kabul Kriteri:** Validasyon kuralları çalışmalı
 
 ### OTEL-17: Public Hotel Routes
-- `[ ]` **OTEL-17.1** `routes/hotel.py` — `GET /hotels` (liste + sayfalama)
-- `[ ]` **OTEL-17.2** `routes/hotel.py` — `GET /hotels/<id>` (detay)
-- `[ ]` **OTEL-17.3** `routes/hotel.py` — `GET /hotels/search` (filtreleme)
-- `[ ]` **OTEL-17.4** `routes/hotel.py` — `POST /hotels/<id>/reserve` (login gerekli)
-- `[ ]` **OTEL-17.5** `routes/hotel.py` — `POST /hotels/<id>/review` (login gerekli)
+- `[x]` **OTEL-17.1** `routes/hotel.py` — `GET /hotels` (liste + sayfalama)
+- `[x]` **OTEL-17.2** `routes/hotel.py` — `GET /hotels/<id>` (detay)
+- `[x]` **OTEL-17.3** `routes/hotel.py` — `GET /hotels/search` (filtreleme)
+- `[x]` **OTEL-17.4** `routes/hotel.py` — `POST /hotels/<id>/reserve` (login gerekli)
+- `[x]` **OTEL-17.5** `routes/hotel.py` — `POST /hotels/<id>/review` (login gerekli)
 > **Kabul Kriteri:** Misafirler otel görebilmeli, giriş yapanlar rezervasyon/yorum yapabilmeli
 
 ### OTEL-18: Hotel Owner Routes
-- `[ ]` **OTEL-18.1** `routes/hotel_owner.py` — `GET /owner/dashboard`
-- `[ ]` **OTEL-18.2** `routes/hotel_owner.py` — `GET/POST /owner/hotel/new`
-- `[ ]` **OTEL-18.3** `routes/hotel_owner.py` — `GET/POST /owner/hotel/<id>/edit`
-- `[ ]` **OTEL-18.4** `routes/hotel_owner.py` — `POST /owner/hotel/<id>/delete`
-- `[ ]` **OTEL-18.5** `routes/hotel_owner.py` — `POST /owner/hotel/<id>/rooms` (oda tipi ekle)
+- `[x]` **OTEL-18.1** `routes/hotel_owner.py` — `GET /owner/dashboard`
+- `[x]` **OTEL-18.2** `routes/hotel_owner.py` — `GET/POST /owner/hotel/new`
+- `[x]` **OTEL-18.3** `routes/hotel_owner.py` — `GET/POST /owner/hotel/<id>/edit`
+- `[x]` **OTEL-18.4** `routes/hotel_owner.py` — `POST /owner/hotel/<id>/delete`
+- `[x]` **OTEL-18.5** `routes/hotel_owner.py` — `POST /owner/hotel/<id>/rooms` (oda tipi ekle)
 > **Kabul Kriteri:** Otel sahibi sadece kendi otellerini yönetebilmeli
 
 ### OTEL-19: Admin Routes
-- `[ ]` **OTEL-19.1** `routes/admin.py` — `GET /admin/dashboard` (istatistikler)
-- `[ ]` **OTEL-19.2** `routes/admin.py` — `GET /admin/hotels` + `POST approve`
-- `[ ]` **OTEL-19.3** `routes/admin.py` — `GET /admin/users` + `POST toggle`
+- `[x]` **OTEL-19.1** `routes/admin.py` — `GET /admin/dashboard` (istatistikler)
+- `[x]` **OTEL-19.2** `routes/admin.py` — `GET /admin/hotels` + `POST approve`
+- `[x]` **OTEL-19.3** `routes/admin.py` — `GET /admin/users` + `POST toggle`
 > **Kabul Kriteri:** Sadece admin erişebilmeli, otel onaylama çalışmalı
 
 ### OTEL-20: User Dashboard Routes
-- `[ ]` **OTEL-20.1** `routes/dashboard.py` — `GET /dashboard` (profil)
-- `[ ]` **OTEL-20.2** `routes/dashboard.py` — `GET /dashboard/reservations`
-- `[ ]` **OTEL-20.3** `routes/dashboard.py` — `POST /dashboard/reservation/<id>/cancel`
+- `[x]` **OTEL-20.1** `routes/dashboard.py` — `GET /dashboard` (profil)
+- `[x]` **OTEL-20.2** `routes/dashboard.py` — `GET /dashboard/reservations`
+- `[x]` **OTEL-20.3** `routes/dashboard.py` — `POST /dashboard/reservation/<id>/cancel`
 > **Kabul Kriteri:** Kullanıcı kendi rezervasyonlarını görebilmeli ve iptal edebilmeli
 
 🔖 **Commit:** `[OTEL-20] CRUD ve iş mantığı tamamlandı` → **Push & Tag v0.4.0**

@@ -1,0 +1,30 @@
+from functools import wraps
+from flask import abort
+from flask_login import current_user
+
+def role_required(role):
+    """
+    Belirli bir role sahip kullanıcıların erişimine izin veren dekoratör.
+    Örnek kullanım: @role_required('admin')
+    """
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if not current_user.is_authenticated or current_user.role != role:
+                abort(403)
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+def hotel_owner_required(f):
+    """
+    Sadece otel sahiplerinin ve adminlerin erişebilmesini sağlayan dekoratör.
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            abort(403)
+        if current_user.role not in ['hotel_owner', 'admin']:
+            abort(403)
+        return f(*args, **kwargs)
+    return decorated_function
