@@ -36,7 +36,7 @@ class User(UserMixin, db.Model):
             },
         )
         # endregion
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = generate_password_hash(password , method='pbkdf2:sha256')
         # region agent log
         agent_debug_log(
             run_id='register-debug',
