@@ -1,5 +1,6 @@
 from typing import Generic, List, Optional, Type, TypeVar
 from app.extensions import db
+from app.utils.agent_debug import agent_debug_log
 
 T = TypeVar('T', bound=db.Model)
 
@@ -25,7 +26,30 @@ class BaseRepository(Generic[T]):
         """Yeni kayıt oluşturur ve DB'ye ekler."""
         entity = self.model(**kwargs)
         db.session.add(entity)
+        # region agent log
+        agent_debug_log(
+            run_id='register-debug',
+            hypothesis_id='H1',
+            location='app/repositories/base_repository.py:31',
+            message='before flush in create',
+            data={
+                'model': self.model.__name__,
+                'has_password_hash': 'password_hash' in kwargs,
+                'password_hash_is_none': kwargs.get('password_hash') is None if 'password_hash' in kwargs else True,
+                'keys': sorted(list(kwargs.keys())),
+            },
+        )
+        # endregion
         db.session.flush()  # ID ataması için, commit service katmanında yapılır
+        # region agent log
+        agent_debug_log(
+            run_id='register-debug',
+            hypothesis_id='H1',
+            location='app/repositories/base_repository.py:43',
+            message='after flush in create',
+            data={'model': self.model.__name__, 'entity_id': getattr(entity, 'id', None)},
+        )
+        # endregion
         return entity
 
     def update(self, entity: T, **kwargs) -> T:

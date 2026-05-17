@@ -28,4 +28,3 @@ def agent_debug_log(
             f.write(json.dumps(payload, ensure_ascii=False) + "\n")
     except Exception:
         pass
-

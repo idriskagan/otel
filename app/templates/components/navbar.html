@@ -18,8 +18,20 @@
         </ul>
 
         <div class="navbar-auth" id="navbar-auth">
-            <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Giriş Yap</a>
-            <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Kayıt Ol</a>
+            {% if current_user.is_authenticated %}
+                <span class="nav-welcome" style="color: var(--text-muted); font-weight: 500; display: flex; align-items: center;">👋 {{ current_user.username }}</span>
+                {% if current_user.role == 'admin' %}
+                    <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-outline">Admin Paneli</a>
+                {% elif current_user.role == 'hotel_owner' %}
+                    <a href="{{ url_for('hotel_owner.owner_dashboard') }}" class="btn btn-outline">Otelim</a>
+                {% else %}
+                    <a href="{{ url_for('dashboard.user_dashboard') }}" class="btn btn-outline">Profilim</a>
+                {% endif %}
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-primary" style="background: var(--danger);">Çıkış</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Giriş Yap</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Kayıt Ol</a>
+            {% endif %}
         </div>
     </div>
 </nav>
