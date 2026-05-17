@@ -25,7 +25,9 @@ def search():
     city = request.args.get('city')
     min_stars = request.args.get('stars', type=int)
     
-    hotels = hotel_service.search_hotels(city=city, min_stars=min_stars, is_approved=True)
+    # hotel_repo.search() pagination döndürür, .items ile listeye çevir
+    pagination = hotel_service.hotel_repo.search(city=city, stars=min_stars)
+    hotels = pagination.items if pagination else []
     return render_template('hotel/search.html', hotels=hotels, city=city, stars=min_stars)
 
 @hotel_bp.route('/<int:hotel_id>')

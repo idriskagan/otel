@@ -45,8 +45,10 @@ class ReservationService:
                 status='pending'
             )
             self.reservation_repo.create(reservation)
+            self.reservation_repo.commit()
             return True, "Rezervasyonunuz başarıyla oluşturuldu, onay bekleniyor.", reservation
         except Exception as e:
+            self.reservation_repo.rollback()
             return False, f"Rezervasyon oluşturulurken bir hata oluştu: {str(e)}", None
 
     def cancel_reservation(self, reservation_id: int, user_id: int) -> Tuple[bool, str]:
@@ -68,8 +70,10 @@ class ReservationService:
         try:
             reservation.status = 'cancelled'
             self.reservation_repo.update(reservation)
+            self.reservation_repo.commit()
             return True, "Rezervasyon başarıyla iptal edildi."
         except Exception as e:
+            self.reservation_repo.rollback()
             return False, f"İptal sırasında hata oluştu: {str(e)}"
             
     def get_user_reservations(self, user_id: int) -> List[Reservation]:

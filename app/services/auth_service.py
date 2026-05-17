@@ -44,8 +44,10 @@ class AuthService:
 
         try:
             self.user_repo.create(new_user)
+            self.user_repo.commit()
             return True, "Kayıt başarıyla tamamlandı.", new_user
         except Exception as e:
+            self.user_repo.rollback()
             return False, f"Kayıt sırasında bir hata oluştu: {str(e)}", None
 
     def authenticate_user(self, email: str, password: str, remember: bool = False) -> Tuple[bool, str, Optional[User]]:
