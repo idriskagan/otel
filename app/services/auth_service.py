@@ -24,28 +24,39 @@ class AuthService:
         if not username or not email or not password:
             return False, "Tüm alanları doldurmak zorunludur.", None
 
+        # Benzersizlik kontrolleri
+        if self.user_repo.email_exists(email):
+            return False, "Bu e-posta adresi ile zaten kayıt olunmuş.", None
+
         if self.user_repo.username_exists(username):
             return False, "Bu kullanıcı adı zaten alınmış.", None
 
-        if self.user_repo.email_exists(email):
-            return False, "Bu e-posta adresi ile zaten kayıt olunmuş.", None
+        # Güvenlik: Sadece user veya hotel_owner seçilebilir, yetkisiz rol ataması engellenir
+        if role not in ['user', 'hotel_owner']:
+            role = 'user'
 
         # Şifre kuralları
         if len(password) < 6:
             return False, "Şifre en az 6 karakter olmalıdır.", None
 
-        # Yeni kullanıcı oluşturma
-        new_user = User(
-            username=username,
-            email=email.lower(),
-            role=role
-        )
-        new_user.set_password(password)
-
         try:
-            self.user_repo.create(new_user)
+            # Yeni kullanıcı oluşturma ve şifre hash'leme
+            new_user = User(
+                username=username,
+                email=email.lower(),
+                role=role
+            )
+            new_user.set_password(password)
+            
+            # Veritabanı işlemleri (Hata durumuna karşı güvenli kayıt)
+            self.user_repo.save(new_user)
+            self.user_repo.commit()
+            
             return True, "Kayıt başarıyla tamamlandı.", new_user
+            
         except Exception as e:
+            # İşlem sırasında hata çıkarsa veritabanını önceki güvenli haline döndür
+            self.user_repo.rollback()
             return False, f"Kayıt sırasında bir hata oluştu: {str(e)}", None
 
     def authenticate_user(self, email: str, password: str, remember: bool = False) -> Tuple[bool, str, Optional[User]]:
@@ -61,7 +72,9 @@ class AuthService:
         if not user.check_password(password):
             return False, "Hatalı şifre girdiniz.", None
 
-        if not user.is_active:
+        if not hasattr(user, 'is_active') or not user.is_active:
+            # is_active alanı modelde yoksa hata vermemesi için hasattr eklendi,
+            # varsa ve pasifse girişi engeller.
             return False, "Hesabınız pasif duruma getirilmiş.", None
 
         # Flask-Login ile oturum açma

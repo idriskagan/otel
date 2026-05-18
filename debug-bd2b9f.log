@@ -1,1 +1,0 @@
-{"sessionId": "bd2b9f", "runId": "register-debug", "hypothesisId": "H1-H3", "location": "app/services/auth_service.py:15", "message": "register_user called", "data": {"username": "kagan", "email": "kagan@gmail.com", "role": "user", "password_is_none": false, "password_length": 7}, "timestamp": 1778124926304}
