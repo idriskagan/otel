@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField
-from wtforms.validators import DataRequired, Email, Length, EqualTo
-
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField
+from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError
+from app.repositories.user_repository import UserRepository
 
 class LoginForm(FlaskForm):
     """OTEL-9.1: Kullanıcı giriş formu."""
@@ -37,5 +37,15 @@ class RegisterForm(FlaskForm):
     role = SelectField('Hesap Türü', choices=[
         ('user', 'Misafir (Otel arıyorum)'),
         ('hotel_owner', 'Otel Sahibi (Otelimi eklemek istiyorum)')
-    ])
+    ], default='user')
     submit = SubmitField('Kayıt Ol')
+
+    def validate_username(self, field):
+        repo = UserRepository()
+        if repo.username_exists(field.data):
+            raise ValidationError("Bu kullanıcı adı zaten kullanılıyor. Lütfen başka bir tane seçin.")
+
+    def validate_email(self, field):
+        repo = UserRepository()
+        if repo.email_exists(field.data):
+            raise ValidationError("Bu e-posta adresi zaten kullanımda. Giriş yapmayı deneyin.")

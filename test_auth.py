@@ -31,7 +31,11 @@ class AuthUnitTestCase(unittest.TestCase):
         self.assertFalse(u.check_password('yanlissifre'))
 
     def test_kayit_olma_endpointi(self):
+<<<<<<< HEAD
+        """OTEL-15: /register API'sine veri gönderildiğinde yanıt dönme testi."""
+=======
         """OTEL-14: /register API'sine veri gönderildiğinde yanıt dönme testi."""
+>>>>>>> origin/development
         response = self.client.post('/auth/register', data={
             'username': 'yeni_kullanici',
             'email': 'test@example.com',

@@ -11,8 +11,8 @@
                 <p>Hesabınıza giriş yaparak rezervasyonlarınızı yönetin.</p>
             </div>
 
-            <form method="POST" action="{{ url_for('auth.login') }}" class="auth-form">
-                {{ form.csrf_token }}
+            <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}" class="auth-form">
+                {{ form.hidden_tag() }}
                 
                 <div class="form-group">
                     {{ form.email.label }}
