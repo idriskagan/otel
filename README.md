@@ -1,3 +1,4 @@
+Yapay Zeka Destekli Otel Kiralama Sistemi
 # 🏨 StayFinder — Otel Rezervasyon Platformu
 
 Türkiye genelinde otelleri arayın, karşılaştırın ve kolayca rezervasyon yapın.

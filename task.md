@@ -71,18 +71,30 @@
 ---
 
 ## ~~EPIC-3: Auth Sistemi — Service + Presentation~~ ✅ TAMAMLANDI
+<<<<<<< HEAD
 **Tag:** `v0.3.0` | **Branch:** `feature/OTEL-epic-3-auth`
+=======
+**Tag:** `v0.3.0` | **Branch:** `kayit_olma`
+>>>>>>> origin/development
 
 ### OTEL-8: Auth Service Layer
 - `[x]` **OTEL-8.1** `services/auth_service.py` — register_user(data): validasyon + hash + kayıt
 - `[x]` **OTEL-8.2** `services/auth_service.py` — login_user(email, password): doğrulama
 - `[x]` **OTEL-8.3** `services/auth_service.py` — Hata yönetimi (duplicate email, yanlış şifre)
+<<<<<<< HEAD
 > **Kabul Kriteri:** Service katmanı route'dan bağımsız test edilebilmeli
+=======
+> ✅ **Kabul Kriteri:** Service katmanı route'dan bağımsız test edilebilir.
+>>>>>>> origin/development
 
 ### OTEL-9: Auth Forms
 - `[x]` **OTEL-9.1** `forms/auth_forms.py` — LoginForm (email, password, CSRF)
 - `[x]` **OTEL-9.2** `forms/auth_forms.py` — RegisterForm (username, email, password, confirm, role)
+<<<<<<< HEAD
 > **Kabul Kriteri:** Validasyon kuralları (email format, min şifre uzunluğu) çalışmalı
+=======
+> ✅ **Kabul Kriteri:** Validasyon kuralları (email format, min şifre uzunluğu) çalışıyor.
+>>>>>>> origin/development
 
 ### OTEL-10: Auth Routes (Presentation)
 - `[x]` **OTEL-10.1** `routes/auth.py` — Blueprint tanımla
@@ -90,21 +102,34 @@
 - `[x]` **OTEL-10.3** `GET/POST /register` — Kayıt sayfası (kullanıcı/otel sahibi seçimi)
 - `[x]` **OTEL-10.4** `GET /logout` — Çıkış
 - `[x]` **OTEL-10.5** Flask-Login user_loader callback
+<<<<<<< HEAD
 > **Kabul Kriteri:** Kayıt → Giriş → Çıkış akışı sorunsuz çalışmalı
+=======
+> ✅ **Kabul Kriteri:** Kayıt → Giriş → Çıkış akışı sorunsuz çalışıyor.
+>>>>>>> origin/development
 
 ### OTEL-11: Yetkilendirme Dekoratörleri
 - `[x]` **OTEL-11.1** `utils/decorators.py` — `@role_required('admin')` dekoratörü
 - `[x]` **OTEL-11.2** `utils/decorators.py` — `@hotel_owner_required` dekoratörü
+<<<<<<< HEAD
 - `[x]` **OTEL-11.3** Yetkisiz erişimde 403 sayfası
 > **Kabul Kriteri:** Normal kullanıcı admin sayfasına erişememeli
+=======
+- `[x]` **OTEL-11.3** Yetkisiz erişimde 403 / redirect
+> ✅ **Kabul Kriteri:** Yetki bazlı dekoratörler eklendi.
+>>>>>>> origin/development
 
 ### OTEL-12: Auth Templates
 - `[x]` **OTEL-12.1** `templates/auth/login.html` — Login formu
 - `[x]` **OTEL-12.2** `templates/auth/register.html` — Kayıt formu
 - `[x]` **OTEL-12.3** Flash mesaj gösterimi (başarı/hata)
+<<<<<<< HEAD
 > **Kabul Kriteri:** Formlar responsive, validasyon hataları görünür
+=======
+> ✅ **Kabul Kriteri:** Formlar responsive ve validasyon hataları gösteriliyor.
+>>>>>>> origin/development
 
-🔖 **Commit:** `[OTEL-12] Auth sistemi tamamlandı` → **Push & Tag v0.3.0**
+🔖 **Commit:** `[OTEL-12] Auth sistemi tamamlandı` → **Push & Tag v0.3.0** ✅
 
 ---
 

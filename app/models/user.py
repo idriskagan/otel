@@ -2,6 +2,7 @@ from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.extensions import db
+from app.utils.agent_debug import agent_debug_log
 
 
 class User(UserMixin, db.Model):
@@ -23,7 +24,31 @@ class User(UserMixin, db.Model):
 
     def set_password(self, password: str) -> None:
         """Şifreyi hash'leyerek kaydeder."""
-        self.password_hash = generate_password_hash(password)
+        # region agent log
+        agent_debug_log(
+            run_id='register-debug',
+            hypothesis_id='H2-H4',
+            location='app/models/user.py:29',
+            message='set_password called',
+            data={
+                'password_is_none': password is None,
+                'password_length': len(password) if isinstance(password, str) else None,
+            },
+        )
+        # endregion
+        self.password_hash = generate_password_hash(password , method='pbkdf2:sha256')
+        # region agent log
+        agent_debug_log(
+            run_id='register-debug',
+            hypothesis_id='H2-H4',
+            location='app/models/user.py:41',
+            message='set_password completed',
+            data={
+                'password_hash_is_none': self.password_hash is None,
+                'password_hash_length': len(self.password_hash) if isinstance(self.password_hash, str) else None,
+            },
+        )
+        # endregion
 
     def check_password(self, password: str) -> bool:
         """Verilen şifrenin hash ile uyuşup uyuşmadığını kontrol eder."""

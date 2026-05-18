@@ -1,30 +1,39 @@
 from functools import wraps
-from flask import abort
+from flask import flash, redirect, url_for
 from flask_login import current_user
 
-def role_required(role):
+def role_required(*roles):
     """
-    Belirli bir role sahip kullanıcıların erişimine izin veren dekoratör.
-    Örnek kullanım: @role_required('admin')
+    OTEL-11.1: Kullanıcının belirli rollere sahip olmasını zorunlu kılan dekoratör.
+    Örnek: @role_required('admin') veya @role_required('admin', 'hotel_owner')
     """
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            if not current_user.is_authenticated or current_user.role != role:
-                abort(403)
+            if not current_user.is_authenticated:
+                flash('Lütfen önce giriş yapın.', 'warning')
+                return redirect(url_for('auth.login'))
+                
+            if current_user.role not in roles:
+                flash('Bu sayfayı görüntülemek için yetkiniz yok.', 'danger')
+                return redirect(url_for('main.index'))
+                
             return f(*args, **kwargs)
         return decorated_function
     return decorator
 
+
 def hotel_owner_required(f):
-    """
-    Sadece otel sahiplerinin ve adminlerin erişebilmesini sağlayan dekoratör.
-    """
+    """OTEL-11.2: Sadece otel sahiplerinin (ve adminlerin) girebileceği rotalar için."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
-            abort(403)
+            flash('Lütfen önce giriş yapın.', 'warning')
+            return redirect(url_for('auth.login'))
+            
         if current_user.role not in ['hotel_owner', 'admin']:
-            abort(403)
+            flash('Sadece otel sahipleri bu sayfaya erişebilir.', 'danger')
+            return redirect(url_for('main.index'))
+            
         return f(*args, **kwargs)
     return decorated_function

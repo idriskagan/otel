@@ -6,36 +6,37 @@ from app.repositories.user_repository import UserRepository
 class LoginForm(FlaskForm):
     """OTEL-9.1: Kullanıcı giriş formu."""
     email = StringField('E-posta', validators=[
-        DataRequired(message="E-posta adresi zorunludur."),
-        Email(message="Geçerli bir e-posta adresi giriniz.")
+        DataRequired(message='E-posta alanı zorunludur.'),
+        Email(message='Geçerli bir e-posta adresi giriniz.')
     ])
     password = PasswordField('Şifre', validators=[
-        DataRequired(message="Şifre zorunludur.")
+        DataRequired(message='Şifre alanı zorunludur.')
     ])
     remember = BooleanField('Beni Hatırla')
     submit = SubmitField('Giriş Yap')
 
+
 class RegisterForm(FlaskForm):
-    """OTEL-9.2: Kullanıcı kayıt formu."""
+    """OTEL-9.2: Yeni kullanıcı kayıt formu."""
     username = StringField('Kullanıcı Adı', validators=[
-        DataRequired(message="Kullanıcı adı zorunludur."),
-        Length(min=3, max=20, message="Kullanıcı adı 3 ile 20 karakter arasında olmalıdır.")
+        DataRequired(message='Kullanıcı adı zorunludur.'),
+        Length(min=3, max=80, message='Kullanıcı adı 3 ile 80 karakter arasında olmalıdır.')
     ])
     email = StringField('E-posta', validators=[
-        DataRequired(message="E-posta adresi zorunludur."),
-        Email(message="Geçerli bir e-posta adresi giriniz.")
+        DataRequired(message='E-posta alanı zorunludur.'),
+        Email(message='Geçerli bir e-posta adresi giriniz.')
     ])
     password = PasswordField('Şifre', validators=[
-        DataRequired(message="Şifre zorunludur."),
-        Length(min=6, message="Şifre en az 6 karakter olmalıdır.")
+        DataRequired(message='Şifre alanı zorunludur.'),
+        Length(min=6, message='Şifre en az 6 karakter olmalıdır.')
     ])
-    confirm_password = PasswordField('Şifreyi Onayla', validators=[
-        DataRequired(message="Şifre onayı zorunludur."),
-        EqualTo('password', message="Şifreler eşleşmiyor.")
+    confirm_password = PasswordField('Şifre Tekrar', validators=[
+        DataRequired(message='Lütfen şifrenizi tekrar girin.'),
+        EqualTo('password', message='Şifreler birbiriyle eşleşmiyor.')
     ])
-    role = SelectField('Kayıt Tipi', choices=[
-        ('user', 'Misafir (Otel aramak ve rezervasyon yapmak istiyorum)'),
-        ('hotel_owner', 'Otel Sahibi (Otelimi listelemek istiyorum)')
+    role = SelectField('Hesap Türü', choices=[
+        ('user', 'Misafir (Otel arıyorum)'),
+        ('hotel_owner', 'Otel Sahibi (Otelimi eklemek istiyorum)')
     ], default='user')
     submit = SubmitField('Kayıt Ol')
 
