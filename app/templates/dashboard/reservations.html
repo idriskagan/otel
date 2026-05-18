@@ -73,6 +73,7 @@
                         {% if res.status != 'cancelled' %}
                             <div style="display: flex; justify-content: flex-end; margin-top: var(--space-2);">
                                 <form action="{{ url_for('dashboard.cancel_reservation', reservation_id=res.id) }}" method="POST" onsubmit="return confirm('Bu rezervasyonu iptal etmek istediğinize emin misiniz?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="btn btn-outline" style="color: var(--danger); border-color: var(--danger);">İptal Et</button>
                                 </form>
                             </div>

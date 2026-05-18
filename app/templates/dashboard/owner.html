@@ -64,6 +64,7 @@
                             <a href="{{ url_for('hotel_owner.hotel_rooms', hotel_id=hotel.id) }}" class="btn btn-primary" style="padding: var(--space-2) var(--space-4);">Oda Yönetimi</a>
                             <a href="{{ url_for('hotel_owner.edit_hotel', hotel_id=hotel.id) }}" class="btn btn-outline" style="padding: var(--space-2) var(--space-4);">Düzenle</a>
                             <form action="{{ url_for('hotel_owner.delete_hotel', hotel_id=hotel.id) }}" method="POST" onsubmit="return confirm('Bu oteli tamamen silmek istediğinize emin misiniz? Bu işlem geri alınamaz.');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="btn btn-outline" style="padding: var(--space-2) var(--space-4); color: var(--danger); border-color: var(--danger);">Sil</button>
                             </form>
                         </div>

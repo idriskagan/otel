@@ -64,6 +64,7 @@ def toggle_user(user_id):
     else:
         user.is_active = not user.is_active
         user_repo.update(user)
+        user_repo.commit()
         status = "aktif" if user.is_active else "pasif"
         flash(f"Kullanıcı {status} duruma getirildi.", "success")
         
