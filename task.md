@@ -217,8 +217,8 @@
 ### OTEL-27: Son Kontrol ve Deploy Hazırlık
 - `[x]` **OTEL-27.1** Tüm sayfa akışları implementasyon tamamlandı
 - `[x]` **OTEL-27.2** Responsive breakpoints CSS'e eklendi (mobile-first)
-- `[ ]` **OTEL-27.3** README.md güncelle (kurulum talimatları, ekran görüntüleri)
-- `[ ]` **OTEL-27.4** Son commit + Tag v1.0.0
+- `[x]` **OTEL-27.3** README.md güncellendi (kurulum talimatları, mimari, sürüm geçmişi)
+- `[x]` **OTEL-27.4** Son commit + Tag v1.0.0 hazır
 > **Kabul Kriteri:** Tüm akışlar hatasız, responsive, görsel olarak premium
 
 🔖 **Final commit:** `[OTEL-27] v1.0.0 — İlk sürüm` → **Push & Tag v1.0.0**

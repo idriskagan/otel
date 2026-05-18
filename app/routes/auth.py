@@ -48,7 +48,12 @@ def login():
             flash(message, 'success')
             next_page = request.args.get('next')
             if not next_page or urlsplit(next_page).netloc != '':
-                next_page = url_for('main.index')
+                if user.role == 'admin':
+                    next_page = url_for('admin.dashboard')
+                elif user.role == 'hotel_owner':
+                    next_page = url_for('hotel_owner.dashboard')
+                else:
+                    next_page = url_for('main.index')
             return redirect(next_page)
         else:
             flash(message, 'danger')
