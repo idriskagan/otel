@@ -72,4 +72,109 @@ document.addEventListener('DOMContentLoaded', () => {
             observer.observe(el);
         });
     }
+
+    // 6. Favorite Toggle AJAX
+    const favoriteButtons = document.querySelectorAll('.favorite-toggle');
+    if (favoriteButtons.length > 0) {
+        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+
+        favoriteButtons.forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const hotelId = btn.getAttribute('data-hotel-id');
+                if (!hotelId) return;
+                
+                try {
+                    const response = await fetch(`/dashboard/favorite/${hotelId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success) {
+                            if (data.is_favorited) {
+                                btn.style.color = '#e11d48';
+                                const textSpan = btn.querySelector('.favorite-text');
+                                if (textSpan) textSpan.textContent = 'Favorilerden Çıkar';
+                            } else {
+                                btn.style.color = 'var(--text-muted)';
+                                const textSpan = btn.querySelector('.favorite-text');
+                                if (textSpan) textSpan.textContent = 'Favorilere Ekle';
+                            }
+                            
+                            if (window.location.pathname === '/dashboard/favorites' && !data.is_favorited) {
+                                window.location.reload();
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error toggling favorite:', error);
+                }
+            });
+        });
+    }
+
+    // 7. Helpful Button AJAX
+    const helpfulButtons = document.querySelectorAll('.helpful-btn');
+    if (helpfulButtons.length > 0) {
+        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+
+        helpfulButtons.forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const reviewId = btn.getAttribute('data-review-id');
+                if (!reviewId) return;
+                
+                try {
+                    const response = await fetch(`/hotels/review/${reviewId}/helpful`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success) {
+                            const countSpan = btn.querySelector('.helpful-count');
+                            if (countSpan) {
+                                countSpan.textContent = parseInt(countSpan.textContent) + 1;
+                            }
+                            btn.disabled = true;
+                            btn.style.color = 'var(--primary)';
+                            btn.style.borderColor = 'var(--primary)';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error voting helpful:', error);
+                }
+            });
+        });
+    }
 });
+
+// Global functions for review forms
+window.toggleEditForm = function(reviewId) {
+    const form = document.getElementById(`edit-form-${reviewId}`);
+    if (form) {
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+};
+
+window.toggleReplyForm = function(reviewId) {
+    const form = document.getElementById(`reply-form-${reviewId}`);
+    if (form) {
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+};

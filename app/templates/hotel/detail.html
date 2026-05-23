@@ -4,15 +4,25 @@
 
 {% block content %}
 <div class="page-header" style="text-align: left; background: var(--bg-card); padding-bottom: var(--space-8);">
-    <div class="container">
-        <h1 style="margin-bottom: var(--space-2);">{{ hotel.name }}</h1>
-        <div style="display: flex; gap: var(--space-4); color: var(--text-muted); align-items: center;">
-            <span><i class="icon">📍</i> {{ hotel.city }}</span>
-            <span><i class="icon">⭐</i> {{ hotel.star_rating }} Yıldız</span>
-            {% if hotel.review_count > 0 %}
-            <span><i class="icon">💬</i> {{ hotel.average_rating }} / 5 ({{ hotel.review_count }} Değerlendirme)</span>
-            {% endif %}
+    <div class="container" style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+            <h1 style="margin-bottom: var(--space-2);">{{ hotel.name }}</h1>
+            <div style="display: flex; gap: var(--space-4); color: var(--text-muted); align-items: center;">
+                <span><i class="icon">📍</i> {{ hotel.city }}</span>
+                <span><i class="icon">⭐</i> {{ hotel.star_rating }} Yıldız</span>
+                {% if hotel.review_count > 0 %}
+                <span><i class="icon">💬</i> {{ hotel.average_rating }} / 5 ({{ hotel.review_count }} Değerlendirme)</span>
+                {% endif %}
+            </div>
         </div>
+        {% if current_user.is_authenticated %}
+        <button class="btn btn-outline favorite-toggle" data-hotel-id="{{ hotel.id }}" style="display: flex; align-items: center; gap: var(--space-2); color: {% if current_user.favorites.filter_by(hotel_id=hotel.id).first() %}#e11d48{% else %}var(--text-muted){% endif %}; border-color: currentColor;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            <span class="favorite-text">{% if current_user.favorites.filter_by(hotel_id=hotel.id).first() %}Favorilerden Çıkar{% else %}Favorilere Ekle{% endif %}</span>
+        </button>
+        {% endif %}
     </div>
 </div>
 
@@ -61,7 +71,17 @@
                     {% endfor %}
                 </div>
 
-                <h2 style="margin-bottom: var(--space-4);">Yorumlar</h2>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--space-4);">
+                    <h2 style="margin: 0;">Yorumlar</h2>
+                    <form method="GET" action="{{ url_for('hotel.hotel_detail', hotel_id=hotel.id) }}" id="sort-reviews-form">
+                        <select name="sort_by" class="form-control select-control" onchange="document.getElementById('sort-reviews-form').submit();" style="padding: 4px 8px; font-size: var(--font-sm);">
+                            <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>En Yeni</option>
+                            <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>En Eski</option>
+                            <option value="highest" {% if sort_by == 'highest' %}selected{% endif %}>En Yüksek Puan</option>
+                            <option value="lowest" {% if sort_by == 'lowest' %}selected{% endif %}>En Düşük Puan</option>
+                        </select>
+                    </form>
+                </div>
                 {% if current_user.is_authenticated %}
                     <form action="{{ url_for('hotel.review', hotel_id=hotel.id) }}" method="POST" class="auth-form" style="background: var(--bg-card); padding: var(--space-6); border-radius: var(--radius-lg); border: 1px solid var(--border); margin-bottom: var(--space-8);">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -93,11 +113,89 @@
                     {% for review in reviews_data.reviews %}
                         <div style="background: var(--bg-card); border: 1px solid var(--border); padding: var(--space-6); border-radius: var(--radius-lg);">
                             <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
-                                <strong>{{ review.user.username }}</strong>
+                                <strong>{{ review.user.first_name or review.user.username }}</strong>
                                 <span style="color: var(--secondary);">{{ '⭐' * review.rating }}</span>
                             </div>
-                            <p style="color: var(--text-muted); font-size: var(--font-sm); margin-bottom: var(--space-2);">{{ review.created_at.strftime('%d.%m.%Y') }}</p>
-                            <p>{{ review.comment }}</p>
+                            <p style="color: var(--text-muted); font-size: var(--font-sm); margin-bottom: var(--space-2);">
+                                {{ review.created_at.strftime('%d.%m.%Y') }}
+                                {% if review.is_edited %} <span style="font-style: italic;">(Düzenlendi)</span> {% endif %}
+                            </p>
+                            <p style="margin-bottom: var(--space-4);">{{ review.comment }}</p>
+                            
+                            <!-- Aksiyonlar -->
+                            <div style="display: flex; gap: var(--space-4); align-items: center; font-size: var(--font-sm);">
+                                {% if current_user.is_authenticated %}
+                                    <button class="btn btn-outline helpful-btn" data-review-id="{{ review.id }}" style="padding: 4px 8px; font-size: var(--font-xs);">
+                                        👍 Faydalı (<span class="helpful-count">{{ review.helpful_count }}</span>)
+                                    </button>
+                                    
+                                    {% if current_user.id == review.user_id %}
+                                        <button onclick="toggleEditForm({{ review.id }})" class="btn btn-outline" style="padding: 4px 8px; font-size: var(--font-xs);">Düzenle</button>
+                                        <form action="{{ url_for('hotel.delete_review', review_id=review.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Silmek istediğinize emin misiniz?');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-outline" style="padding: 4px 8px; font-size: var(--font-xs); color: #e11d48; border-color: #e11d48;">Sil</button>
+                                        </form>
+                                    {% endif %}
+                                    
+                                    {% if current_user.id == hotel.owner_id %}
+                                        <button onclick="toggleReplyForm({{ review.id }})" class="btn btn-outline" style="padding: 4px 8px; font-size: var(--font-xs);">Yanıtla</button>
+                                    {% endif %}
+                                {% else %}
+                                    <span style="color: var(--text-muted);">👍 {{ review.helpful_count }} kişi faydalı buldu</span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Düzenleme Formu (Gizli) -->
+                            {% if current_user.is_authenticated and current_user.id == review.user_id %}
+                            <form id="edit-form-{{ review.id }}" action="{{ url_for('hotel.edit_review', review_id=review.id) }}" method="POST" class="auth-form" style="display: none; margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px dashed var(--border);">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="form-group">
+                                    <select name="rating" class="form-control select-control" required style="padding: 4px 8px; font-size: var(--font-sm);">
+                                        <option value="5" {% if review.rating == 5 %}selected{% endif %}>5 - Mükemmel</option>
+                                        <option value="4" {% if review.rating == 4 %}selected{% endif %}>4 - Çok İyi</option>
+                                        <option value="3" {% if review.rating == 3 %}selected{% endif %}>3 - İyi</option>
+                                        <option value="2" {% if review.rating == 2 %}selected{% endif %}>2 - İdare Eder</option>
+                                        <option value="1" {% if review.rating == 1 %}selected{% endif %}>1 - Kötü</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <textarea name="comment" class="form-control" rows="2" required>{{ review.comment }}</textarea>
+                                </div>
+                                <div style="display: flex; gap: var(--space-2);">
+                                    <button type="submit" class="btn btn-primary btn-sm">Kaydet</button>
+                                    <button type="button" class="btn btn-outline btn-sm" onclick="toggleEditForm({{ review.id }})">İptal</button>
+                                </div>
+                            </form>
+                            {% endif %}
+
+                            <!-- Yanıtlama Formu (Gizli) -->
+                            {% if current_user.is_authenticated and current_user.id == hotel.owner_id %}
+                            <form id="reply-form-{{ review.id }}" action="{{ url_for('hotel.reply_review', review_id=review.id) }}" method="POST" class="auth-form" style="display: none; margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px dashed var(--border);">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="form-group">
+                                    <textarea name="comment" class="form-control" rows="2" placeholder="Yanıtınız..." required></textarea>
+                                </div>
+                                <div style="display: flex; gap: var(--space-2);">
+                                    <button type="submit" class="btn btn-primary btn-sm">Yanıt Gönder</button>
+                                    <button type="button" class="btn btn-outline btn-sm" onclick="toggleReplyForm({{ review.id }})">İptal</button>
+                                </div>
+                            </form>
+                            {% endif %}
+
+                            <!-- Yanıtlar -->
+                            {% if review.replies.count() > 0 %}
+                            <div style="margin-top: var(--space-4); padding-left: var(--space-6); border-left: 2px solid var(--border);">
+                                {% for reply in review.replies %}
+                                    <div style="margin-top: var(--space-4);">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
+                                            <strong>{{ hotel.name }} (Otel Sahibi)</strong>
+                                            <span style="color: var(--text-muted); font-size: var(--font-sm);">{{ reply.created_at.strftime('%d.%m.%Y') }}</span>
+                                        </div>
+                                        <p>{{ reply.comment }}</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
                     {% else %}
                         <p class="text-muted">Henüz yorum yapılmamış.</p>

@@ -28,9 +28,15 @@ class HotelRepository(BaseRepository[Hotel]):
     def search(self, city: str = None, stars: int = None,
                price_min: float = None, price_max: float = None,
                amenity_ids: List[int] = None,
+               check_in: str = None, check_out: str = None,
                sort_by: str = 'newest',
                page: int = 1, per_page: int = 12):
         """Filtreli ve sıralı otel arama."""
+        from app.models.amenity import Amenity
+        from app.models.reservation import Reservation
+        from app.models.room import RoomType
+        from datetime import datetime
+        
         query = db.select(Hotel).where(
             Hotel.is_approved == True,
             Hotel.is_active == True
@@ -38,17 +44,49 @@ class HotelRepository(BaseRepository[Hotel]):
         if city:
             query = query.where(Hotel.city.ilike(f'%{city}%'))
         if stars:
-            query = query.where(Hotel.star_rating == stars)
+            query = query.where(Hotel.star_rating >= stars)
         if price_min is not None:
-            query = query.where(Hotel.price_min >= price_min)
+            query = query.where(Hotel.room_types.any(RoomType.price_per_night >= price_min))
         if price_max is not None:
-            query = query.where(Hotel.price_max <= price_max)
+            query = query.where(Hotel.room_types.any(RoomType.price_per_night <= price_max))
+
+        if amenity_ids:
+            for a_id in amenity_ids:
+                query = query.where(Hotel.amenities.any(Amenity.id == a_id))
+
+        if check_in and check_out:
+            try:
+                ci_date = datetime.strptime(check_in, '%Y-%m-%d').date()
+                co_date = datetime.strptime(check_out, '%Y-%m-%d').date()
+                
+                conflict_res = (
+                    db.select(Reservation.room_type_id, db.func.count(Reservation.id).label('booked'))
+                    .where(
+                        Reservation.status != 'cancelled',
+                        Reservation.check_in < co_date,
+                        Reservation.check_out > ci_date
+                    )
+                    .group_by(Reservation.room_type_id)
+                    .subquery()
+                )
+                
+                available_rooms_query = (
+                    db.select(RoomType.hotel_id)
+                    .outerjoin(conflict_res, RoomType.id == conflict_res.c.room_type_id)
+                    .where(
+                        RoomType.total_rooms > db.func.coalesce(conflict_res.c.booked, 0)
+                    )
+                )
+                
+                query = query.filter(Hotel.id.in_(available_rooms_query))
+            except ValueError:
+                pass
 
         # Sıralama
         if sort_by == 'price_asc':
-            query = query.order_by(Hotel.price_min.asc())
+            query = query.outerjoin(Hotel.room_types).order_by(RoomType.price_per_night.asc())
         elif sort_by == 'price_desc':
-            query = query.order_by(Hotel.price_min.desc())
+            query = query.outerjoin(Hotel.room_types).order_by(RoomType.price_per_night.desc())
         elif sort_by == 'stars':
             query = query.order_by(Hotel.star_rating.desc())
         else:
