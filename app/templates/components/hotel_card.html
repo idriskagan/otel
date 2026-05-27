@@ -1,14 +1,47 @@
-<!-- Otel kartı bileşeni — EPIC-5'te tam tasarım yapılacak -->
-<div class="hotel-card" id="hotel-card-{{ hotel.id }}">
-    <div class="hotel-card-image">
-        <img src="{{ hotel.primary_image or url_for('static', filename='images/placeholder.jpg') }}" alt="{{ hotel.name }}">
-    </div>
-    <div class="hotel-card-body">
-        <h3 class="hotel-card-title">{{ hotel.name }}</h3>
-        <p class="hotel-card-city">📍 {{ hotel.city }}</p>
-        <div class="hotel-card-stars">
-            {% for i in range(hotel.star_rating) %}⭐{% endfor %}
+<a href="{{ url_for('hotel.hotel_detail', hotel_id=hotel.id) }}" class="hotel-card-link" id="hotel-card-{{ hotel.id }}" style="text-decoration: none;">
+    <div class="hotel-card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: var(--transition); display: flex; flex-direction: column;">
+        
+        <!-- Fotoğraf -->
+        <div style="height: 200px; overflow: hidden; position: relative; background: var(--surface);">
+            {% if hotel.primary_image %}
+                <img src="{{ url_for('static', filename=hotel.primary_image) }}" alt="{{ hotel.name }}"
+                     style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;">
+            {% else %}
+                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 3rem;">🏨</div>
+            {% endif %}
+            <!-- Yıldız Rozeti -->
+            <div style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: var(--radius-sm); font-size: var(--font-xs); color: var(--secondary);">
+                {% for i in range(hotel.star_rating) %}⭐{% endfor %}
+            </div>
         </div>
-        <p class="hotel-card-price">₺{{ hotel.price_min }} — ₺{{ hotel.price_max }} / gece</p>
+
+        <!-- Bilgiler -->
+        <div style="padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); flex: 1;">
+            <h3 style="font-size: var(--font-lg); font-weight: 700; color: var(--text-heading); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                {{ hotel.name }}
+            </h3>
+            <p style="color: var(--text-muted); font-size: var(--font-sm); margin: 0;">📍 {{ hotel.city }}</p>
+
+            <!-- Rating -->
+            {% if hotel.review_count > 0 %}
+            <div style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--font-sm);">
+                <span style="color: var(--secondary); font-weight: 600;">{{ hotel.average_rating }}</span>
+                <span style="color: var(--text-muted);">/ 5 — {{ hotel.review_count }} yorum</span>
+            </div>
+            {% endif %}
+
+            <!-- Fiyat -->
+            <div style="margin-top: auto; padding-top: var(--space-3); border-top: 1px solid var(--border); display: flex; align-items: baseline; gap: var(--space-2);">
+                {% set rooms = hotel.room_types.all() %}
+                {% if rooms %}
+                    {% set prices = rooms | map(attribute='price_per_night') | list %}
+                    {% set min_price = prices | min %}
+                    <span style="font-size: var(--font-xl); font-weight: 800; color: var(--primary-light);">{{ min_price | int }} ₺</span>
+                    <span style="font-size: var(--font-sm); color: var(--text-muted);">/ geceden başlayan</span>
+                {% else %}
+                    <span style="font-size: var(--font-sm); color: var(--text-muted);">Fiyat bilgisi yok</span>
+                {% endif %}
+            </div>
+        </div>
     </div>
-</div>
+</a>

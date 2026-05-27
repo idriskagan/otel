@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ hotel.name }} — StayFinder{% endblock %}
+
+{% block content %}
+<div class="page-header" style="text-align: left; background: var(--bg-card); padding-bottom: var(--space-8);">
+    <div class="container">
+        <h1 style="margin-bottom: var(--space-2);">{{ hotel.name }}</h1>
+        <div style="display: flex; gap: var(--space-4); color: var(--text-muted); align-items: center;">
+            <span><i class="icon">📍</i> {{ hotel.city }}</span>
+            <span><i class="icon">⭐</i> {{ hotel.star_rating }} Yıldız</span>
+            {% if hotel.review_count > 0 %}
+            <span><i class="icon">💬</i> {{ hotel.average_rating }} / 5 ({{ hotel.review_count }} Değerlendirme)</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<section class="section" style="padding-top: var(--space-8);">
+    <div class="container">
+        
+        <!-- Galeri -->
+        <div class="hotel-gallery" style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-4); margin-bottom: var(--space-12); height: 400px;">
+            <div class="main-image" style="background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden;">
+                {% if hotel.primary_image %}
+                    <img src="{{ url_for('static', filename=hotel.primary_image) }}" alt="{{ hotel.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--border);">Fotoğraf Yok</div>
+                {% endif %}
+            </div>
+            <div class="side-images" style="display: grid; grid-template-rows: 1fr 1fr; gap: var(--space-4);">
+                {% for img in hotel.images.all()[1:3] %}
+                    <div style="background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden;">
+                        <img src="{{ url_for('static', filename=img.image_path) }}" alt="{{ hotel.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-8);">
+            
+            <!-- Sol Sütun: Açıklama ve Yorumlar -->
+            <div>
+                <h2 style="margin-bottom: var(--space-4);">Otel Hakkında</h2>
+                <p style="color: var(--text-muted); margin-bottom: var(--space-8); white-space: pre-wrap;">{{ hotel.description or 'Açıklama bulunmuyor.' }}</p>
+
+                <h2 style="margin-bottom: var(--space-4);">Oda Tipleri</h2>
+                <div style="display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-8);">
+                    {% for room in hotel.room_types %}
+                        <div style="background: var(--bg-card); border: 1px solid var(--border); padding: var(--space-4); border-radius: var(--radius-lg); display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4 style="font-size: var(--font-lg); color: var(--text-heading);">{{ room.name }}</h4>
+                                <p style="color: var(--text-muted); font-size: var(--font-sm);">Kapasite: {{ room.capacity }} Kişi | Toplam: {{ room.total_rooms }} Oda</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: var(--font-xl); font-weight: bold; color: var(--primary-light);">{{ room.price_per_night }} ₺ <span style="font-size: var(--font-sm); font-weight: normal; color: var(--text-muted);">/ gece</span></div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Bu otele ait oda tipi bulunmuyor.</p>
+                    {% endfor %}
+                </div>
+
+                <h2 style="margin-bottom: var(--space-4);">Yorumlar</h2>
+                {% if current_user.is_authenticated %}
+                    <form action="{{ url_for('hotel.review', hotel_id=hotel.id) }}" method="POST" class="auth-form" style="background: var(--bg-card); padding: var(--space-6); border-radius: var(--radius-lg); border: 1px solid var(--border); margin-bottom: var(--space-8);">
+                        <h4 style="margin-bottom: var(--space-4);">Yorum Bırak</h4>
+                        <div class="form-group">
+                            <label>Puanınız</label>
+                            <select name="rating" class="form-control select-control" required>
+                                <option value="5">5 - Mükemmel</option>
+                                <option value="4">4 - Çok İyi</option>
+                                <option value="3">3 - İyi</option>
+                                <option value="2">2 - İdare Eder</option>
+                                <option value="1">1 - Kötü</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Yorumunuz</label>
+                            <textarea name="comment" class="form-control" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="margin-top: var(--space-4);">Yorum Gönder</button>
+                    </form>
+                {% else %}
+                    <div style="background: var(--bg-card); padding: var(--space-4); border-radius: var(--radius-lg); border: 1px solid var(--border); margin-bottom: var(--space-8); text-align: center;">
+                        <p style="margin-bottom: var(--space-2);">Yorum yapmak için giriş yapmalısınız.</p>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Giriş Yap</a>
+                    </div>
+                {% endif %}
+
+                <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+                    {% for review in reviews_data.reviews %}
+                        <div style="background: var(--bg-card); border: 1px solid var(--border); padding: var(--space-6); border-radius: var(--radius-lg);">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
+                                <strong>{{ review.user.username }}</strong>
+                                <span style="color: var(--secondary);">{{ '⭐' * review.rating }}</span>
+                            </div>
+                            <p style="color: var(--text-muted); font-size: var(--font-sm); margin-bottom: var(--space-2);">{{ review.created_at.strftime('%d.%m.%Y') }}</p>
+                            <p>{{ review.comment }}</p>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Henüz yorum yapılmamış.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Sağ Sütun: Rezervasyon Formu -->
+            <div>
+                <div style="position: sticky; top: 100px; background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); padding: var(--space-6); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg);">
+                    <h3 style="margin-bottom: var(--space-4); font-size: var(--font-2xl);">Rezervasyon Yap</h3>
+                    <form action="{{ url_for('hotel.reserve', hotel_id=hotel.id) }}" method="POST" class="auth-form">
+                        {{ form.csrf_token }}
+                        <div class="form-group">
+                            {{ form.check_in.label }}
+                            {{ form.check_in(class="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.check_out.label }}
+                            {{ form.check_out(class="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.guests.label }}
+                            {{ form.guests(class="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            <label>Oda Tipi Seçin</label>
+                            <select name="room_type_id" class="form-control select-control" required>
+                                <option value="">Oda seçiniz...</option>
+                                {% for room in hotel.room_types %}
+                                    <option value="{{ room.id }}">{{ room.name }} ({{ room.price_per_night }} ₺/gece)</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% if current_user.is_authenticated %}
+                            {{ form.submit(class="btn btn-primary btn-block", style="margin-top: var(--space-6);") }}
+                        {% else %}
+                            <div style="margin-top: var(--space-6); text-align: center;">
+                                <p style="margin-bottom: var(--space-2); font-size: var(--font-sm); color: var(--text-muted);">Rezervasyon için giriş yapmalısınız.</p>
+                                <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-block">Giriş Yap</a>
+                            </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}

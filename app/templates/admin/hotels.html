@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin - Otel Yönetimi — StayFinder{% endblock %}
+
+{% block content %}
+<div class="page-header" style="text-align: left; background: var(--bg-card); padding-bottom: var(--space-8);">
+    <div class="container">
+        <h1>Otel Yönetimi</h1>
+        <p>Sistemdeki tüm otelleri inceleyebilir ve onay bekleyenleri onaylayabilirsiniz.</p>
+    </div>
+</div>
+
+<section class="section" style="padding-top: var(--space-8);">
+    <div class="container" style="display: grid; grid-template-columns: 250px 1fr; gap: var(--space-8);">
+        
+        <!-- Sidebar -->
+        <aside style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: var(--space-4); height: fit-content;">
+            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-2);">
+                <li>
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline" style="width: 100%; justify-content: flex-start; text-align: left; border: none;">
+                        Gösterge Paneli
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin.hotels') }}" class="btn btn-primary" style="width: 100%; justify-content: flex-start; text-align: left;">
+                        Otel Yönetimi
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin.users') }}" class="btn btn-outline" style="width: 100%; justify-content: flex-start; text-align: left; border: none;">
+                        Kullanıcı Yönetimi
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- İçerik -->
+        <div>
+            <div style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead style="background: rgba(15, 23, 42, 0.5); border-bottom: 1px solid var(--border);">
+                        <tr>
+                            <th style="padding: var(--space-4); font-weight: 600; color: var(--text-muted);">ID</th>
+                            <th style="padding: var(--space-4); font-weight: 600; color: var(--text-muted);">Otel Adı</th>
+                            <th style="padding: var(--space-4); font-weight: 600; color: var(--text-muted);">Şehir</th>
+                            <th style="padding: var(--space-4); font-weight: 600; color: var(--text-muted);">Sahibi</th>
+                            <th style="padding: var(--space-4); font-weight: 600; color: var(--text-muted);">Durum</th>
+                            <th style="padding: var(--space-4); font-weight: 600; color: var(--text-muted); text-align: right;">İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for hotel in pagination.items %}
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: var(--space-4);">#{{ hotel.id }}</td>
+                            <td style="padding: var(--space-4); font-weight: 500;">{{ hotel.name }}</td>
+                            <td style="padding: var(--space-4);">{{ hotel.city }}</td>
+                            <td style="padding: var(--space-4);">{{ hotel.owner.username }}</td>
+                            <td style="padding: var(--space-4);">
+                                {% if hotel.is_approved %}
+                                    <span style="color: var(--success); font-size: var(--font-sm); font-weight: bold;">Onaylı</span>
+                                {% else %}
+                                    <span style="color: var(--warning); font-size: var(--font-sm); font-weight: bold;">Beklemede</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding: var(--space-4); text-align: right;">
+                                {% if not hotel.is_approved %}
+                                <form action="{{ url_for('admin.approve_hotel', hotel_id=hotel.id) }}" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-outline" style="padding: var(--space-1) var(--space-3); font-size: var(--font-xs); color: var(--success); border-color: var(--success);">Onayla</button>
+                                </form>
+                                {% else %}
+                                <span style="color: var(--text-muted); font-size: var(--font-xs);">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" style="padding: var(--space-8); text-align: center; color: var(--text-muted);">Otel bulunamadı.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Sayfalama -->
+            <div style="margin-top: var(--space-6); display: flex; justify-content: center; gap: var(--space-2);">
+                {% for p in pagination.iter_pages() %}
+                    {% if p %}
+                        <a href="{{ url_for('admin.hotels', page=p) }}" class="btn {% if p == pagination.page %}btn-primary{% else %}btn-outline{% endif %}" style="padding: var(--space-1) var(--space-3);">{{ p }}</a>
+                    {% else %}
+                        <span style="align-self: flex-end;">...</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

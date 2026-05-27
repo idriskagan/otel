@@ -40,7 +40,6 @@ class AuthService:
             return False, "Şifre en az 6 karakter olmalıdır.", None
 
         try:
-            # Yeni kullanıcı oluşturma ve şifre hash'leme
             new_user = User(
                 username=username,
                 email=email.lower(),
@@ -48,14 +47,12 @@ class AuthService:
             )
             new_user.set_password(password)
             
-            # Veritabanı işlemleri (Hata durumuna karşı güvenli kayıt)
-            self.user_repo.save(new_user)
+            self.user_repo.create(new_user)
             self.user_repo.commit()
             
             return True, "Kayıt başarıyla tamamlandı.", new_user
             
         except Exception as e:
-            # İşlem sırasında hata çıkarsa veritabanını önceki güvenli haline döndür
             self.user_repo.rollback()
             return False, f"Kayıt sırasında bir hata oluştu: {str(e)}", None
 

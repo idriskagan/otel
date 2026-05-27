@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} — StayFinder{% endblock %}
+
+{% block content %}
+<div class="page-header" style="text-align: left; background: var(--bg-card); padding-bottom: var(--space-8);">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>{{ title }}</h1>
+            <p>Otel bilgilerini eksiksiz doldurmaya özen gösterin.</p>
+        </div>
+        <a href="{{ url_for('hotel_owner.dashboard') }}" class="btn btn-outline">Geri Dön</a>
+    </div>
+</div>
+
+<section class="section" style="padding-top: var(--space-8);">
+    <div class="container">
+        
+        <div style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: var(--space-8); max-width: 800px; margin: 0 auto;">
+            <form action="" method="POST" enctype="multipart/form-data" class="auth-form">
+                {{ form.csrf_token }}
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        {{ form.name.label }}
+                        {{ form.name(class="form-control", placeholder="Örn: StayFinder Resort Hotel") }}
+                        {% if form.name.errors %}
+                            <span class="error-msg">{{ form.name.errors[0] }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.city.label }}
+                        {{ form.city(class="form-control", placeholder="Örn: Antalya") }}
+                        {% if form.city.errors %}
+                            <span class="error-msg">{{ form.city.errors[0] }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.star_rating.label }}
+                        {{ form.star_rating(class="form-control select-control") }}
+                        {% if form.star_rating.errors %}
+                            <span class="error-msg">{{ form.star_rating.errors[0] }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.phone.label }}
+                        {{ form.phone(class="form-control", placeholder="Örn: +90 555 123 4567") }}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.email.label }}
+                        {{ form.email(class="form-control", placeholder="Örn: info@hotel.com") }}
+                    </div>
+                    
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        {{ form.address.label }}
+                        {{ form.address(class="form-control", rows="2") }}
+                    </div>
+                    
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        {{ form.description.label }}
+                        {{ form.description(class="form-control", rows="4") }}
+                    </div>
+                    
+                    <div class="form-group" style="grid-column: 1 / -1; background: rgba(15, 23, 42, 0.5); padding: var(--space-4); border-radius: var(--radius); border: 1px dashed var(--border);">
+                        {{ form.images.label(style="display: block; margin-bottom: var(--space-2);") }}
+                        {{ form.images(class="form-control", style="padding: var(--space-2); border: none; background: transparent;") }}
+                        <small style="color: var(--text-muted); display: block; margin-top: var(--space-1);">Ctrl/Cmd tuşuna basılı tutarak birden fazla fotoğraf seçebilirsiniz.</small>
+                        {% if form.images.errors %}
+                            <span class="error-msg">{{ form.images.errors[0] }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div style="margin-top: var(--space-6); text-align: right;">
+                    {{ form.submit(class="btn btn-primary", style="padding: var(--space-3) var(--space-8);") }}
+                </div>
+            </form>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

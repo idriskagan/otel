@@ -938,3 +938,48 @@ img {
 .auth-footer a {
     font-weight: 600;
 }
+
+/* ---------- Hotel Card Hover ---------- */
+.hotel-card-link:hover .hotel-card {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+}
+
+.hotel-card-link:hover img {
+    transform: scale(1.05);
+}
+
+/* ---------- Utility Classes ---------- */
+.text-muted { color: var(--text-muted); }
+.text-heading { color: var(--text-heading); }
+.text-center { text-align: center; }
+.mt-auto { margin-top: auto; }
+
+/* ---------- Dashboard Grid Responsive ---------- */
+@media (max-width: 900px) {
+    .container[style*="grid-template-columns: 280px"] {
+        grid-template-columns: 1fr !important;
+    }
+    .container[style*="grid-template-columns: 250px"] {
+        grid-template-columns: 1fr !important;
+    }
+    .container[style*="grid-template-columns: 350px"] {
+        grid-template-columns: 1fr !important;
+    }
+    .container[style*="grid-template-columns: 2fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ---------- Table Responsive ---------- */
+@media (max-width: 768px) {
+    table { font-size: var(--font-sm); }
+    th, td { padding: var(--space-2) var(--space-3) !important; }
+}
+
+/* ---------- Navbar Sticky bg on scroll ---------- */
+.navbar.scrolled {
+    background: rgba(15, 23, 42, 0.98);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Oda Yönetimi — StayFinder{% endblock %}
+
+{% block content %}
+<div class="page-header" style="text-align: left; background: var(--bg-card); padding-bottom: var(--space-8);">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>{{ hotel.name }} - Oda Yönetimi</h1>
+            <p>Otele ait oda tiplerini buradan ekleyip silebilirsiniz.</p>
+        </div>
+        <a href="{{ url_for('hotel_owner.dashboard') }}" class="btn btn-outline">Geri Dön</a>
+    </div>
+</div>
+
+<section class="section" style="padding-top: var(--space-8);">
+    <div class="container" style="display: grid; grid-template-columns: 350px 1fr; gap: var(--space-8);">
+        
+        <!-- Oda Ekleme Formu -->
+        <aside style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: var(--space-6); height: fit-content;">
+            <h3 style="margin-bottom: var(--space-4);">Yeni Oda Tipi Ekle</h3>
+            <form action="" method="POST" class="auth-form">
+                {{ form.csrf_token }}
+                
+                <div class="form-group">
+                    {{ form.name.label }}
+                    {{ form.name(class="form-control", placeholder="Örn: Deluxe Suit") }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form.capacity.label }}
+                    {{ form.capacity(class="form-control", placeholder="Örn: 2") }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form.price_per_night.label }}
+                    <div style="position: relative;">
+                        {{ form.price_per_night(class="form-control", placeholder="Örn: 1500") }}
+                        <span style="position: absolute; right: var(--space-4); top: 50%; transform: translateY(-50%); color: var(--text-muted);">₺</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    {{ form.total_rooms.label }}
+                    {{ form.total_rooms(class="form-control", placeholder="Örn: 10") }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form.description.label }}
+                    {{ form.description(class="form-control", rows="3") }}
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: var(--space-2);">Oda Tipini Kaydet</button>
+            </form>
+        </aside>
+
+        <!-- Mevcut Odalar -->
+        <div>
+            <h2 style="margin-bottom: var(--space-6);">Mevcut Oda Tipleri</h2>
+            <div style="display: grid; gap: var(--space-4);">
+                {% for room in hotel.room_types %}
+                    <div style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: var(--space-6); display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h3 style="color: var(--text-heading); font-size: var(--font-xl); margin-bottom: var(--space-1);">{{ room.name }}</h3>
+                            <p style="color: var(--text-muted); font-size: var(--font-sm); max-width: 400px; margin-bottom: var(--space-2);">{{ room.description or 'Açıklama yok.' }}</p>
+                            <div style="display: flex; gap: var(--space-4); font-size: var(--font-sm);">
+                                <span style="background: rgba(15, 23, 42, 0.5); padding: var(--space-1) var(--space-2); border-radius: var(--radius-sm);"><i class="icon">👥</i> Kapasite: {{ room.capacity }} Kişi</span>
+                                <span style="background: rgba(15, 23, 42, 0.5); padding: var(--space-1) var(--space-2); border-radius: var(--radius-sm);"><i class="icon">🚪</i> Toplam: {{ room.total_rooms }} Oda</span>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: var(--font-2xl); font-weight: bold; color: var(--primary-light);">{{ room.price_per_night }} ₺</div>
+                            <div style="font-size: var(--font-sm); color: var(--text-muted);">/ gece</div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div style="text-align: center; padding: var(--space-8); background: rgba(15, 23, 42, 0.5); border-radius: var(--radius-lg);">
+                        <p class="text-muted">Bu otele ait henüz bir oda tipi eklenmemiş.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

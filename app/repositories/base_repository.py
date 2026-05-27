@@ -22,9 +22,15 @@ class BaseRepository(Generic[T]):
         """Tüm kayıtları döndürür."""
         return db.session.execute(db.select(self.model)).scalars().all()
 
-    def create(self, **kwargs) -> T:
-        """Yeni kayıt oluşturur ve DB'ye ekler."""
-        entity = self.model(**kwargs)
+    def create(self, entity: T = None, **kwargs) -> T:
+        """Yeni kayıt oluşturur ve DB'ye ekler.
+        
+        İki şekilde kullanılabilir:
+          - repo.create(user_obj)           # Hazır obje geçilir
+          - repo.create(name=..., email=...) # kwargs ile oluşturulur
+        """
+        if entity is None:
+            entity = self.model(**kwargs)
         db.session.add(entity)
         # region agent log
         agent_debug_log(

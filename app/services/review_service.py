@@ -34,8 +34,10 @@ class ReviewService:
                 comment=comment
             )
             self.review_repo.create(review)
+            self.review_repo.commit()
             return True, "Yorumunuz başarıyla eklendi.", review
         except Exception as e:
+            self.review_repo.rollback()
             return False, f"Yorum eklenirken hata oluştu: {str(e)}", None
 
     def get_hotel_reviews(self, hotel_id: int, page: int = 1, per_page: int = 10) -> Dict[str, Any]:

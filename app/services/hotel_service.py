@@ -30,8 +30,10 @@ class HotelService:
                 is_approved=False # Yeni oteller onaya düşer
             )
             self.hotel_repo.create(hotel)
+            self.hotel_repo.commit()
             return True, "Otel başarıyla eklendi, yönetici onayı bekleniyor.", hotel
         except Exception as e:
+            self.hotel_repo.rollback()
             return False, f"Otel eklenirken bir hata oluştu: {str(e)}", None
 
     def update_hotel(self, hotel_id: int, owner_id: int, data: Dict[str, Any]) -> Tuple[bool, str, Optional[Hotel]]:
@@ -53,18 +55,15 @@ class HotelService:
             if 'email' in data: hotel.email = data['email']
             
             self.hotel_repo.update(hotel)
+            self.hotel_repo.commit()
             return True, "Otel başarıyla güncellendi.", hotel
         except Exception as e:
+            self.hotel_repo.rollback()
             return False, f"Güncelleme sırasında hata oluştu: {str(e)}", None
 
     def search_hotels(self, city: Optional[str] = None, min_stars: Optional[int] = None, is_approved: bool = True) -> List[Hotel]:
         """Otelleri filtreler."""
-        # Şimdilik sadece city ve yıldız için basit arama, ileride repository içindeki search kullanılabilir
-        query_args = {'is_approved': is_approved}
-        if city:
-            query_args['city'] = city
-        # star_rating repository içinde filterlanacak, burada basit pass-through yapıyoruz.
-        return self.hotel_repo.search(city=city, min_stars=min_stars, is_approved=is_approved)
+        return self.hotel_repo.search(city=city, stars=min_stars)
         
     def approve_hotel(self, hotel_id: int) -> Tuple[bool, str]:
         """Oteli onaylar (Admin yetkisi gerektirir)."""
@@ -75,8 +74,10 @@ class HotelService:
         try:
             hotel.is_approved = True
             self.hotel_repo.update(hotel)
+            self.hotel_repo.commit()
             return True, "Otel onaylandı."
         except Exception as e:
+            self.hotel_repo.rollback()
             return False, f"Onaylama sırasında hata oluştu: {str(e)}"
             
     def upload_images(self, hotel_id: int, owner_id: int, files: List[Any]) -> Tuple[bool, str]:

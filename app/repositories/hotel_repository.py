@@ -75,3 +75,9 @@ class HotelRepository(BaseRepository[Hotel]):
         return db.session.execute(
             db.select(db.func.count(Hotel.id)).where(Hotel.is_approved == True)
         ).scalar()
+
+    def count_all(self) -> int:
+        """Toplam otel sayısını döndürür."""
+        return db.session.execute(
+            db.select(db.func.count(Hotel.id))
+        ).scalar()
