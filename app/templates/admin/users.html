@@ -65,6 +65,7 @@
                             <td style="padding: var(--space-4); text-align: right;">
                                 {% if current_user.id != user.id %}
                                 <form action="{{ url_for('admin.toggle_user', user_id=user.id) }}" method="POST" style="display: inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     {% if user.is_active %}
                                         <button type="submit" class="btn btn-outline" style="padding: var(--space-1) var(--space-3); font-size: var(--font-xs); color: var(--danger); border-color: var(--danger);">Pasif Yap</button>
                                     {% else %}

@@ -97,9 +97,11 @@ def delete_hotel(hotel_id):
         
     try:
         hotel_service.hotel_repo.delete(hotel)
+        hotel_service.hotel_repo.commit()
         flash("Otel başarıyla silindi.", "success")
     except Exception as e:
-        flash("Otel silinirken hata oluştu.", "danger")
+        hotel_service.hotel_repo.rollback()
+        flash(f"Otel silinirken hata oluştu: {str(e)}", "danger")
         
     return redirect(url_for('hotel_owner.dashboard'))
 
