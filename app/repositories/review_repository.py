@@ -10,13 +10,22 @@ class ReviewRepository(BaseRepository[Review]):
     def __init__(self):
         super().__init__(Review)
 
-    def get_by_hotel(self, hotel_id: int, page: int = 1, per_page: int = 10):
-        """Otele ait yorumları sayfalı döndürür."""
+    def get_by_hotel(self, hotel_id: int, page: int = 1, per_page: int = 10, sort_by: str = 'newest'):
+        """Otele ait ana yorumları sayfalı döndürür."""
         query = (
             db.select(Review)
-            .where(Review.hotel_id == hotel_id)
-            .order_by(Review.created_at.desc())
+            .where(Review.hotel_id == hotel_id, Review.parent_id == None)
         )
+        
+        if sort_by == 'oldest':
+            query = query.order_by(Review.created_at.asc())
+        elif sort_by == 'highest':
+            query = query.order_by(Review.rating.desc(), Review.created_at.desc())
+        elif sort_by == 'lowest':
+            query = query.order_by(Review.rating.asc(), Review.created_at.desc())
+        else:
+            query = query.order_by(Review.created_at.desc())
+            
         return self.paginate(page=page, per_page=per_page, query=query)
 
     def get_average_rating(self, hotel_id: int) -> float:

@@ -16,21 +16,69 @@
         <!-- Filtre Paneli -->
         <aside class="filter-panel" style="background: var(--bg-card); padding: var(--space-6); border-radius: var(--radius-lg); border: 1px solid var(--border); height: fit-content;">
             <h3 style="margin-bottom: var(--space-4);">Filtreler</h3>
-            <form action="{{ url_for('hotel.search') }}" method="GET" class="auth-form">
+            <form action="{{ url_for('hotel.search') }}" method="GET" class="auth-form" id="search-filter-form">
+                
                 <div class="form-group">
                     <label>Şehir</label>
-                    <input type="text" name="city" class="form-control" placeholder="Şehir adı...">
+                    <input type="text" name="city" class="form-control" value="{{ city or '' }}" placeholder="Şehir adı...">
                 </div>
+                
+                <div class="form-group">
+                    <label>Giriş Tarihi</label>
+                    <input type="date" name="check_in" id="filter-checkin" class="form-control" value="{{ check_in or '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label>Çıkış Tarihi</label>
+                    <input type="date" name="check_out" id="filter-checkout" class="form-control" value="{{ check_out or '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label>Fiyat Aralığı (₺)</label>
+                    <div style="display: flex; gap: var(--space-2);">
+                        <input type="number" name="price_min" class="form-control" placeholder="Min" value="{{ price_min or '' }}">
+                        <input type="number" name="price_max" class="form-control" placeholder="Max" value="{{ price_max or '' }}">
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label>Minimum Yıldız</label>
                     <select name="stars" class="form-control select-control">
                         <option value="">Tümü</option>
-                        <option value="3">3 Yıldız ve üzeri</option>
-                        <option value="4">4 Yıldız ve üzeri</option>
-                        <option value="5">5 Yıldız</option>
+                        <option value="3" {% if stars == 3 %}selected{% endif %}>3 Yıldız ve üzeri</option>
+                        <option value="4" {% if stars == 4 %}selected{% endif %}>4 Yıldız ve üzeri</option>
+                        <option value="5" {% if stars == 5 %}selected{% endif %}>5 Yıldız</option>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary" style="margin-top: var(--space-4);">Filtrele</button>
+
+                <div class="form-group">
+                    <label>Sıralama</label>
+                    <select name="sort_by" class="form-control select-control" onchange="document.getElementById('search-filter-form').submit();">
+                        <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>En Yeni</option>
+                        <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>Fiyat (Artan)</option>
+                        <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>Fiyat (Azalan)</option>
+                        <option value="stars" {% if sort_by == 'stars' %}selected{% endif %}>Yıldız (Azalan)</option>
+                    </select>
+                </div>
+
+                <hr style="border:none; border-top: 1px solid var(--border); margin: var(--space-4) 0;">
+                
+                <h4 style="margin-bottom: var(--space-2);">Olanaklar</h4>
+                {% for category, items in amenity_groups.items() %}
+                    <div style="margin-bottom: var(--space-4);">
+                        <strong style="font-size: var(--font-sm); color: var(--text-muted); display: block; margin-bottom: var(--space-2);">{{ category|title }}</strong>
+                        <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+                            {% for amenity in items %}
+                            <label style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--font-sm); cursor: pointer;">
+                                <input type="checkbox" name="amenities" value="{{ amenity.id }}" {% if amenity.id in selected_amenities %}checked{% endif %}>
+                                {{ amenity.icon }} {{ amenity.name }}
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top: var(--space-4);">Filtreleri Uygula</button>
             </form>
         </aside>
 
@@ -47,7 +95,9 @@
                 <div style="margin-top: var(--space-8); display: flex; justify-content: center; gap: var(--space-2);">
                     {% for p in hotels.iter_pages() %}
                         {% if p %}
-                            <a href="{{ url_for('hotel.list_hotels', page=p) }}" class="btn {% if p == hotels.page %}btn-primary{% else %}btn-outline{% endif %}">{{ p }}</a>
+                            {% set args = request.args.copy() %}
+                            {% set _ = args.update({'page': p}) %}
+                            <a href="{{ url_for('hotel.search', **args) }}" class="btn {% if p == hotels.page %}btn-primary{% else %}btn-outline{% endif %}">{{ p }}</a>
                         {% else %}
                             <span style="align-self: flex-end;">...</span>
                         {% endif %}

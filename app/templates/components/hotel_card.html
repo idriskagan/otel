@@ -10,9 +10,17 @@
                 <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 3rem;">🏨</div>
             {% endif %}
             <!-- Yıldız Rozeti -->
-            <div style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: var(--radius-sm); font-size: var(--font-xs); color: var(--secondary);">
+            <div style="position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: var(--radius-sm); font-size: var(--font-xs); color: var(--secondary);">
                 {% for i in range(hotel.star_rating) %}⭐{% endfor %}
             </div>
+            <!-- Favori Butonu -->
+            {% if current_user.is_authenticated %}
+                <button class="favorite-toggle" data-hotel-id="{{ hotel.id }}" style="position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: {% if current_user.favorites.filter_by(hotel_id=hotel.id).first() %}#e11d48{% else %}var(--text-muted){% endif %}; transition: transform 0.2s, color 0.2s; z-index: 10;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                </button>
+            {% endif %}
         </div>
 
         <!-- Bilgiler -->

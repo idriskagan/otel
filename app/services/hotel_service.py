@@ -61,9 +61,21 @@ class HotelService:
             self.hotel_repo.rollback()
             return False, f"Güncelleme sırasında hata oluştu: {str(e)}", None
 
-    def search_hotels(self, city: Optional[str] = None, min_stars: Optional[int] = None, is_approved: bool = True) -> List[Hotel]:
+    def search_hotels(self, city: Optional[str] = None, min_stars: Optional[int] = None, 
+                      price_min: Optional[float] = None, price_max: Optional[float] = None,
+                      amenity_ids: List[int] = None,
+                      check_in: str = None, check_out: str = None,
+                      sort_by: str = 'newest',
+                      page: int = 1, per_page: int = 12) -> Any:
         """Otelleri filtreler."""
-        return self.hotel_repo.search(city=city, stars=min_stars)
+        return self.hotel_repo.search(
+            city=city, stars=min_stars,
+            price_min=price_min, price_max=price_max,
+            amenity_ids=amenity_ids,
+            check_in=check_in, check_out=check_out,
+            sort_by=sort_by,
+            page=page, per_page=per_page
+        )
         
     def approve_hotel(self, hotel_id: int) -> Tuple[bool, str]:
         """Oteli onaylar (Admin yetkisi gerektirir)."""

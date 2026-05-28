@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Profili Düzenle — StayFinder{% endblock %}
+
+{% block content %}
+<div class="page-header" style="text-align: left; background: var(--bg-card); padding-bottom: var(--space-8);">
+    <div class="container">
+        <h1>Profili Düzenle</h1>
+        <p>Hesap bilgilerinizi ve kişisel verilerinizi güncelleyin.</p>
+    </div>
+</div>
+
+<section class="section" style="padding-top: var(--space-8);">
+    <div class="container" style="display: grid; grid-template-columns: 250px 1fr; gap: var(--space-8);">
+        
+        <!-- Sidebar -->
+        <aside style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: var(--space-4); height: fit-content;">
+            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-2);">
+                <li>
+                    <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline" style="width: 100%; justify-content: flex-start; text-align: left; border: none;">
+                        Profilim
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('dashboard.profile_edit') }}" class="btn btn-primary" style="width: 100%; justify-content: flex-start; text-align: left;">
+                        Profili Düzenle
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('dashboard.change_password') }}" class="btn btn-outline" style="width: 100%; justify-content: flex-start; text-align: left; border: none;">
+                        Şifre Değiştir
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('dashboard.reservations') }}" class="btn btn-outline" style="width: 100%; justify-content: flex-start; text-align: left; border: none;">
+                        Rezervasyonlarım
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- İçerik -->
+        <div style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: var(--space-8);">
+            
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                
+                <div style="display: flex; gap: var(--space-6); margin-bottom: var(--space-6); align-items: center;">
+                    <div style="width: 100px; height: 100px; border-radius: 50%; overflow: hidden; background: var(--bg-body); border: 2px solid var(--primary);">
+                        <img src="{{ current_user.avatar_url }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            {{ form.avatar.label(class="form-label") }}
+                            {{ form.avatar(class="form-control", accept="image/png, image/jpeg, image/webp") }}
+                            {% if form.avatar.errors %}
+                                <div style="color: var(--danger); font-size: var(--font-sm); margin-top: var(--space-1);">
+                                    {% for error in form.avatar.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <p style="font-size: var(--font-sm); color: var(--text-muted); margin-top: var(--space-2);">Önerilen boyut: 256x256px (Kare formatına kırpılacaktır)</p>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                    <div class="form-group">
+                        {{ form.first_name.label(class="form-label") }}
+                        {{ form.first_name(class="form-control", placeholder="Adınız") }}
+                        {% if form.first_name.errors %}
+                            <div style="color: var(--danger); font-size: var(--font-sm);">{% for error in form.first_name.errors %}{{ error }}{% endfor %}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.last_name.label(class="form-label") }}
+                        {{ form.last_name(class="form-control", placeholder="Soyadınız") }}
+                        {% if form.last_name.errors %}
+                            <div style="color: var(--danger); font-size: var(--font-sm);">{% for error in form.last_name.errors %}{{ error }}{% endfor %}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                    <div class="form-group">
+                        {{ form.username.label(class="form-label") }}
+                        {{ form.username(class="form-control", placeholder="Kullanıcı Adı") }}
+                        {% if form.username.errors %}
+                            <div style="color: var(--danger); font-size: var(--font-sm);">{% for error in form.username.errors %}{{ error }}{% endfor %}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.phone.label(class="form-label") }}
+                        {{ form.phone(class="form-control", placeholder="Telefon Numarası") }}
+                        {% if form.phone.errors %}
+                            <div style="color: var(--danger); font-size: var(--font-sm);">{% for error in form.phone.errors %}{{ error }}{% endfor %}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    {{ form.email.label(class="form-label") }}
+                    {{ form.email(class="form-control", placeholder="E-posta Adresi") }}
+                    {% if form.email.errors %}
+                        <div style="color: var(--danger); font-size: var(--font-sm);">{% for error in form.email.errors %}{{ error }}{% endfor %}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.bio.label(class="form-label") }}
+                    {{ form.bio(class="form-control", rows="4", placeholder="Kendinizden kısaca bahsedin...") }}
+                    {% if form.bio.errors %}
+                        <div style="color: var(--danger); font-size: var(--font-sm);">{% for error in form.bio.errors %}{{ error }}{% endfor %}</div>
+                    {% endif %}
+                </div>
+
+                <div style="display: flex; gap: var(--space-4); margin-top: var(--space-6);">
+                    {{ form.submit(class="btn btn-primary", style="flex: 1;") }}
+                    <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline" style="flex: 1;">İptal</a>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
