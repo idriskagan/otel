@@ -4,6 +4,8 @@ from app.repositories.hotel_repository import HotelRepository
 import os
 from werkzeug.utils import secure_filename
 from flask import current_app
+from app.extensions import db
+
 
 class HotelService:
     """OTEL-13: Otel işlemleri için servis katmanı."""
@@ -117,10 +119,13 @@ class HotelService:
                         image_path=f"uploads/{save_name}",
                         is_primary=is_primary
                     )
-                    # Repository'e eklemek için: (Burada objeyi hotel.images'e append edip save edebiliriz)
-                    self.hotel_repo.db.session.add(new_image)
+                    
+                    # Fotoğrafı veritabanı oturumuna ekle
+                    db.session.add(new_image)
             
-            self.hotel_repo.db.session.commit()
+            # FOR döngüsü bittikten sonra hepsini tek seferde kaydet
+            db.session.commit()
             return True, "Fotoğraflar başarıyla yüklendi."
+            
         except Exception as e:
             return False, f"Fotoğraf yüklenirken hata oluştu: {str(e)}"
