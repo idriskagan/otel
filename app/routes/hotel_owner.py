@@ -41,13 +41,22 @@ def new_hotel():
         if success:
             # Resim varsa yükle
             if form.images.data and form.images.data[0].filename:
-                hotel_service.upload_images(hotel.id, current_user.id, request.files.getlist('images'))
+                img_success, img_msg = hotel_service.upload_images(hotel.id, current_user.id, request.files.getlist('images'))
+        
+                # EĞER FOTOĞRAF YÜKLENEMEZSE EKRANA UYARI BAS VE KONSOLA YAZ:
+                if not img_success:
+                    print("FOTOĞRAF HATASI:", img_msg)
+                    flash(f"Otel eklendi ancak {img_msg}", "warning")
+                    return redirect(url_for('hotel_owner.dashboard'))
             
             flash(message, "success")
             return redirect(url_for('hotel_owner.dashboard'))
         else:
             flash(message, "danger")
-            
+    elif request.method == 'POST':
+        # EĞER FORM VALIDATION BAŞARISIZ OLURSA KONSOLA YAZDIR:
+        print("FORM HATALARI:", form.errors)
+        flash("Lütfen formdaki hataları kontrol edin.", "danger")        
     return render_template('dashboard/owner_hotel_form.html', form=form, title="Yeni Otel Ekle")
 
 @hotel_owner_bp.route('/hotel/<int:hotel_id>/edit', methods=['GET', 'POST'])

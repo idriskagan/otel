@@ -18,7 +18,7 @@
         
         <div style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: var(--space-8); max-width: 800px; margin: 0 auto;">
             <form action="" method="POST" enctype="multipart/form-data" class="auth-form">
-                {{ form.csrf_token }}
+                {{ form.hidden_tag() }}
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
                     <div class="form-group" style="grid-column: 1 / -1;">
