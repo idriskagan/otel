@@ -42,7 +42,22 @@ class HotelRepository(BaseRepository[Hotel]):
             Hotel.is_active == True
         )
         if city:
-            query = query.where(Hotel.city.ilike(f'%{city}%'))
+            city_lower = city.lower()
+            
+            # 'i' harfi ile başlayan kelimelerde 'İ' dönüşümünü manuel yapıyoruz
+            if city_lower.startswith('i'):
+                city_tr_title = 'İ' + city_lower[1:]
+            else:
+                city_tr_title = city.title()
+
+            # Veritabanında hem orijinal girilen metni, hem de baş harfi düzeltilmiş metni ara
+            query = query.where(
+                db.or_(
+                    Hotel.city.ilike(f'%{city}%'),
+                    Hotel.city.like(f'%{city_tr_title}%'),
+                    Hotel.city.like(f'%{city_lower}%')
+                )
+            )
         if stars:
             query = query.where(Hotel.star_rating >= stars)
         if price_min is not None:
