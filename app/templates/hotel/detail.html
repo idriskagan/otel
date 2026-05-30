@@ -245,5 +245,268 @@
         </div>
     </div>
 </section>
+<button id="chatbot-toggle-btn" class="chatbot-toggle-btn">
+    💬 Otel Asistanına Sor
+</button>
+
+<div id="chatbot-window" class="chatbot-window" style="display: none;">
+    <div class="chatbot-header">
+        <div class="chatbot-title">
+            🤖 {{ hotel.name }} Asistanı
+        </div>
+        <button id="chatbot-close-btn" class="chatbot-close-btn">✖</button>
+    </div>
+    
+    <div id="chatbot-messages" class="chatbot-messages">
+        <div class="chat-msg bot-msg">
+            Merhaba! Ben bu otelin yapay zeka asistanıyım. Size odalar, kurallar veya hizmetlerimiz hakkında nasıl yardımcı olabilirim?
+        </div>
+    </div>
+    
+    <div class="chatbot-input-area">
+        <input type="text" id="chatbot-input" placeholder="Bir soru sorun..." autocomplete="off">
+        <button id="chatbot-send-btn" class="btn btn-primary" style="padding: 0 16px;">Gönder</button>
+    </div>
+</div>
+
+<style>
+    .chatbot-toggle-btn {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: linear-gradient(135deg, #6366f1, #4f46e5); /* Sitenizin mor/mavi tonuna uygun */
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 12px 24px;
+        font-weight: bold;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        cursor: pointer;
+        z-index: 1000;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .chatbot-toggle-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+    }
+    
+    .chatbot-window {
+        position: fixed;
+        bottom: 85px;
+        right: 24px;
+        width: 350px;
+        height: 450px;
+        background-color: var(--bg-card, #1e293b); /* Sitenizin kart rengi */
+        border: 1px solid var(--border, #334155);
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        display: flex;
+        flex-direction: column;
+        z-index: 1000;
+        overflow: hidden;
+    }
+    
+    .chatbot-header {
+        background-color: rgba(15, 23, 42, 0.95);
+        padding: 12px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border, #334155);
+    }
+    .chatbot-title { color: white; font-weight: bold; font-size: 14px; }
+    .chatbot-close-btn { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 16px; }
+    .chatbot-close-btn:hover { color: white; }
+    
+    .chatbot-messages {
+        flex: 1;
+        padding: 16px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background-color: var(--bg-body, #0f172a);
+    }
+    
+    .chat-msg {
+        max-width: 85%;
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+    .bot-msg {
+        background-color: #334155;
+        color: #f8fafc;
+        align-self: flex-start;
+        border-bottom-left-radius: 2px;
+    }
+    .user-msg {
+        background-color: #4f46e5;
+        color: white;
+        align-self: flex-end;
+        border-bottom-right-radius: 2px;
+    }
+    
+    .chatbot-input-area {
+        display: flex;
+        padding: 12px;
+        background-color: var(--bg-card, #1e293b);
+        border-top: 1px solid var(--border, #334155);
+        gap: 8px;
+    }
+    .chatbot-input-area input {
+        flex: 1;
+        background-color: #0f172a;
+        border: 1px solid #334155;
+        color: white;
+        border-radius: 6px;
+        padding: 8px 12px;
+        outline: none;
+    }
+    .chatbot-input-area input:focus { border-color: #6366f1; }
+    
+    .typing-indicator { font-style: italic; color: #94a3b8; font-size: 12px; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('chatbot-toggle-btn');
+    const windowEl = document.getElementById('chatbot-window');
+    const closeBtn = document.getElementById('chatbot-close-btn');
+    const sendBtn = document.getElementById('chatbot-send-btn');
+    const inputEl = document.getElementById('chatbot-input');
+    const messagesEl = document.getElementById('chatbot-messages');
+    
+    // Güvenlik Token'ı (Daha önceki konfigürasyonlardan alıyoruz)
+    const csrfInput = document.querySelector('input[name="csrf_token"]');
+    const csrfToken = csrfInput ? csrfInput.value : '{{ csrf_token() if csrf_token else "" }}';
+
+    // Flask Route Adresimiz (Backend'e yazdığımız yer)
+    const chatApiUrl = "{{ url_for('hotel.hotel_chatbot', hotel_id=hotel.id) }}";
+
+    // Aç/Kapat Mantığı
+    toggleBtn.addEventListener('click', () => {
+        windowEl.style.display = windowEl.style.display === 'none' ? 'flex' : 'none';
+        if(windowEl.style.display === 'flex') inputEl.focus();
+    });
+    closeBtn.addEventListener('click', () => windowEl.style.display = 'none');
+
+    // Mesaj Ekleme Fonksiyonu
+    function appendMessage(text, sender) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `chat-msg ${sender}-msg`;
+        msgDiv.textContent = text;
+        messagesEl.appendChild(msgDiv);
+        messagesEl.scrollTop = messagesEl.scrollHeight; // En alta kaydır
+    }
+
+    // Backend'e İstek Atma
+    async function sendMessage() {
+        const text = inputEl.value.trim();
+        if(!text) return;
+
+        // Kullanıcı mesajını ekrana bas
+        appendMessage(text, 'user');
+        inputEl.value = '';
+        inputEl.disabled = true;
+        sendBtn.disabled = true;
+
+        // "Yazıyor..." ibaresi ekle
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'chat-msg bot-msg typing-indicator';
+        typingDiv.textContent = 'Asistan düşünüyor...';
+        messagesEl.appendChild(typingDiv);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+
+        try {
+            const response = await fetch(chatApiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ message: text })
+            });
+            
+            const data = await response.json();
+            
+            // Yazıyor... ibaresini kaldır
+            messagesEl.removeChild(typingDiv);
+
+            if(data.success) {
+                appendMessage(data.reply, 'bot');
+            } else {
+                appendMessage('Hata: ' + data.message, 'bot');
+            }
+        } catch (error) {
+            messagesEl.removeChild(typingDiv);
+            appendMessage('Bağlantı hatası oluştu, lütfen tekrar deneyin.', 'bot');
+            console.error(error);
+        } finally {
+            inputEl.disabled = false;
+            sendBtn.disabled = false;
+            inputEl.focus();
+        }
+    }
+
+    // Tıklama veya Enter'a basınca gönder
+    sendBtn.addEventListener('click', sendMessage);
+    inputEl.addEventListener('keypress', function(e) {
+        if(e.key === 'Enter') sendMessage();
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // CSRF Token'ı sayfadaki mevcut formların içinden bulalım
+    const csrfInput = document.querySelector('input[name="csrf_token"]');
+    const csrfToken = csrfInput ? csrfInput.value : '';
+
+    // Tüm faydalı butonlarını seç
+    const helpfulButtons = document.querySelectorAll('.helpful-btn');
+
+    helpfulButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault(); // Sayfa yenilenmesini engelle
+            
+            const reviewId = this.getAttribute('data-review-id');
+            const countSpan = this.querySelector('.helpful-count');
+            
+            // Flask'taki rotanıza istek atıyoruz
+            fetch(`/review/${reviewId}/helpful`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest', // Flask'ın AJAX isteği olduğunu anlaması için
+                    'X-CSRFToken': csrfToken // Güvenlik token'ı
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    // Sayacı 1 artır
+                    let currentCount = parseInt(countSpan.textContent) || 0;
+                    countSpan.textContent = currentCount + 1;
+                    
+                    // Butonu devre dışı bırak (tekrar basılmasın)
+                    this.disabled = true;
+                    this.style.opacity = '0.6';
+                    this.style.cursor = 'not-allowed';
+                    this.innerHTML = `👍 Faydalı Buldunuz (<span class="helpful-count">${currentCount + 1}</span>)`;
+                } else {
+                    // Hata varsa kullanıcıya göster (Örn: "Zaten oyladınız")
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('İstek hatası:', error);
+                alert("Bir hata oluştu, lütfen daha sonra tekrar deneyin.");
+            });
+        });
+    });
+});
+</script>
 
 {% endblock %}
