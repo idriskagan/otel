@@ -1,15 +1,17 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify 
 from flask_login import current_user, login_required
 from app.services.hotel_service import HotelService
 from app.services.reservation_service import ReservationService
 from app.services.review_service import ReviewService
 from app.forms.reservation_forms import ReservationForm
+from app.services.chatbot_service import ChatbotService
 
 hotel_bp = Blueprint('hotel', __name__, url_prefix='/hotels')
 
 hotel_service = HotelService()
 reservation_service = ReservationService()
 review_service = ReviewService()
+chatbot_service = ChatbotService()
 
 @hotel_bp.route('/')
 def list_hotels():
@@ -181,3 +183,23 @@ def helpful_review(review_id):
     else:
         flash(message, "danger")
     return redirect(request.referrer or url_for('hotel.list_hotels'))
+
+@hotel_bp.route('/<int:hotel_id>/chat', methods=['POST'])
+def hotel_chatbot(hotel_id):
+    """OTEL-CHATBOT: Gemini destekli otel bilgi asistanı (Service Entegreli)."""
+    data = request.get_json()
+    
+    if not data or not data.get('message'):
+        return jsonify({'success': False, 'message': 'Lütfen bir mesaj gönderin.'}), 400
+        
+    user_message = data['message']
+    
+    # Tüm ağır işi Service katmanına devrediyoruz
+    success, response_message = chatbot_service.ask_hotel_assistant(hotel_id, user_message)
+    
+    if success:
+        return jsonify({'success': True, 'reply': response_message})
+    else:
+        # Eğer success False dönerse, response_message içinde hata detayı vardır
+        status_code = 404 if "bulunamadı" in response_message else 500
+        return jsonify({'success': False, 'message': response_message}), status_code
