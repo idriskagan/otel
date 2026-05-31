@@ -29,27 +29,25 @@
 <section class="section" style="padding-top: var(--space-8);">
     <div class="container">
         
-        <!-- Galeri -->
-        <div class="hotel-gallery" style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-4); margin-bottom: var(--space-12); height: 400px;">
-            <div class="main-image" style="background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden;">
+        <div class="hotel-gallery" style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-4); margin-bottom: 80px; height: 450px; position: relative; clear: both;">
+            <div class="main-image" style="background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; height: 100%;">
                 {% if hotel.primary_image %}
-                    <img src="{{ url_for('static', filename=hotel.primary_image) }}" alt="{{ hotel.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="{{ url_for('static', filename=hotel.primary_image) }}" alt="{{ hotel.name }}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                 {% else %}
                     <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--border);">Fotoğraf Yok</div>
                 {% endif %}
             </div>
-            <div class="side-images" style="display: grid; grid-template-rows: 1fr 1fr; gap: var(--space-4);">
+            <div class="side-images" style="display: grid; grid-template-rows: 1fr 1fr; gap: var(--space-4); height: 100%;">
                 {% for img in hotel.images.all()[1:3] %}
-                    <div style="background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden;">
-                        <img src="{{ url_for('static', filename=img.image_path) }}" alt="{{ hotel.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div style="background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; height: 100%;">
+                        <img src="{{ url_for('static', filename=img.image_path) }}" alt="{{ hotel.name }}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                     </div>
                 {% endfor %}
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-8);">
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-8); position: relative; clear: both;">
             
-            <!-- Sol Sütun: Açıklama ve Yorumlar -->
             <div>
                 <h2 style="margin-bottom: var(--space-4);">Otel Hakkında</h2>
                 <p style="color: var(--text-muted); margin-bottom: var(--space-8); white-space: pre-wrap;">{{ hotel.description or 'Açıklama bulunmuyor.' }}</p>
@@ -72,7 +70,15 @@
                 </div>
 
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--space-4);">
-                    <h2 style="margin: 0;">Yorumlar</h2>
+                    <div style="display: flex; align-items: center; gap: var(--space-4);">
+                        <h2 style="margin: 0;">Yorumlar</h2>
+                        {% if hotel.review_count > 0 %}
+                        <button id="ai-summary-btn" class="btn btn-outline" style="padding: 4px 12px; font-size: var(--font-sm); border-color: #8b5cf6; color: #8b5cf6; display: flex; align-items: center; gap: 8px;">
+                            ✨ AI ile Özetle
+                        </button>
+                        {% endif %}
+                    </div>
+    
                     <form method="GET" action="{{ url_for('hotel.hotel_detail', hotel_id=hotel.id) }}" id="sort-reviews-form">
                         <select name="sort_by" class="form-control select-control" onchange="document.getElementById('sort-reviews-form').submit();" style="padding: 4px 8px; font-size: var(--font-sm);">
                             <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>En Yeni</option>
@@ -82,6 +88,16 @@
                         </select>
                     </form>
                 </div>
+
+                <div id="ai-summary-box" style="display: none; background: linear-gradient(to right, rgba(139, 92, 246, 0.1), transparent); border-left: 4px solid #8b5cf6; padding: var(--space-6); margin-bottom: var(--space-8); border-radius: 0 var(--radius-lg) var(--radius-lg) 0;">
+                    <div style="font-weight: bold; color: #8b5cf6; margin-bottom: var(--space-4); display: flex; align-items: center; gap: 8px;">
+                        🤖 Yapay Zeka Müşteri Değerlendirme Özeti
+                    </div>
+                    <div id="ai-summary-content" style="font-size: var(--font-sm); line-height: 1.6; color: var(--text-heading);">
+                        Yorumlar okunuyor ve analiz ediliyor... Lütfen bekleyin.
+                    </div>
+                </div>
+                
                 {% if current_user.is_authenticated %}
                     <form action="{{ url_for('hotel.review', hotel_id=hotel.id) }}" method="POST" class="auth-form" style="background: var(--bg-card); padding: var(--space-6); border-radius: var(--radius-lg); border: 1px solid var(--border); margin-bottom: var(--space-8);">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -122,7 +138,6 @@
                             </p>
                             <p style="margin-bottom: var(--space-4);">{{ review.comment }}</p>
                             
-                            <!-- Aksiyonlar -->
                             <div style="display: flex; gap: var(--space-4); align-items: center; font-size: var(--font-sm);">
                                 {% if current_user.is_authenticated %}
                                     <button class="btn btn-outline helpful-btn" data-review-id="{{ review.id }}" style="padding: 4px 8px; font-size: var(--font-xs);">
@@ -145,7 +160,6 @@
                                 {% endif %}
                             </div>
 
-                            <!-- Düzenleme Formu (Gizli) -->
                             {% if current_user.is_authenticated and current_user.id == review.user_id %}
                             <form id="edit-form-{{ review.id }}" action="{{ url_for('hotel.edit_review', review_id=review.id) }}" method="POST" class="auth-form" style="display: none; margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px dashed var(--border);">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -168,7 +182,6 @@
                             </form>
                             {% endif %}
 
-                            <!-- Yanıtlama Formu (Gizli) -->
                             {% if current_user.is_authenticated and current_user.id == hotel.owner_id %}
                             <form id="reply-form-{{ review.id }}" action="{{ url_for('hotel.reply_review', review_id=review.id) }}" method="POST" class="auth-form" style="display: none; margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px dashed var(--border);">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -182,7 +195,6 @@
                             </form>
                             {% endif %}
 
-                            <!-- Yanıtlar -->
                             {% if review.replies.count() > 0 %}
                             <div style="margin-top: var(--space-4); padding-left: var(--space-6); border-left: 2px solid var(--border);">
                                 {% for reply in review.replies %}
@@ -203,7 +215,6 @@
                 </div>
             </div>
 
-            <!-- Sağ Sütun: Rezervasyon Formu -->
             <div>
                 <div style="position: sticky; top: 100px; background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); padding: var(--space-6); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg);">
                     <h3 style="margin-bottom: var(--space-4); font-size: var(--font-2xl);">Rezervasyon Yap</h3>
@@ -245,6 +256,7 @@
         </div>
     </div>
 </section>
+
 <button id="chatbot-toggle-btn" class="chatbot-toggle-btn">
     💬 Otel Asistanına Sor
 </button>
@@ -274,7 +286,7 @@
         position: fixed;
         bottom: 24px;
         right: 24px;
-        background: linear-gradient(135deg, #6366f1, #4f46e5); /* Sitenizin mor/mavi tonuna uygun */
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
         color: white;
         border: none;
         border-radius: 50px;
@@ -296,7 +308,7 @@
         right: 24px;
         width: 350px;
         height: 450px;
-        background-color: var(--bg-card, #1e293b); /* Sitenizin kart rengi */
+        background-color: var(--bg-card, #1e293b);
         border: 1px solid var(--border, #334155);
         border-radius: 12px;
         box-shadow: 0 10px 25px rgba(0,0,0,0.5);
@@ -378,41 +390,34 @@ document.addEventListener('DOMContentLoaded', function() {
     const inputEl = document.getElementById('chatbot-input');
     const messagesEl = document.getElementById('chatbot-messages');
     
-    // Güvenlik Token'ı (Daha önceki konfigürasyonlardan alıyoruz)
     const csrfInput = document.querySelector('input[name="csrf_token"]');
     const csrfToken = csrfInput ? csrfInput.value : '{{ csrf_token() if csrf_token else "" }}';
 
-    // Flask Route Adresimiz (Backend'e yazdığımız yer)
     const chatApiUrl = "{{ url_for('hotel.hotel_chatbot', hotel_id=hotel.id) }}";
 
-    // Aç/Kapat Mantığı
     toggleBtn.addEventListener('click', () => {
         windowEl.style.display = windowEl.style.display === 'none' ? 'flex' : 'none';
         if(windowEl.style.display === 'flex') inputEl.focus();
     });
     closeBtn.addEventListener('click', () => windowEl.style.display = 'none');
 
-    // Mesaj Ekleme Fonksiyonu
     function appendMessage(text, sender) {
         const msgDiv = document.createElement('div');
         msgDiv.className = `chat-msg ${sender}-msg`;
         msgDiv.textContent = text;
         messagesEl.appendChild(msgDiv);
-        messagesEl.scrollTop = messagesEl.scrollHeight; // En alta kaydır
+        messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
-    // Backend'e İstek Atma
     async function sendMessage() {
         const text = inputEl.value.trim();
         if(!text) return;
 
-        // Kullanıcı mesajını ekrana bas
         appendMessage(text, 'user');
         inputEl.value = '';
         inputEl.disabled = true;
         sendBtn.disabled = true;
 
-        // "Yazıyor..." ibaresi ekle
         const typingDiv = document.createElement('div');
         typingDiv.className = 'chat-msg bot-msg typing-indicator';
         typingDiv.textContent = 'Asistan düşünüyor...';
@@ -431,7 +436,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const data = await response.json();
             
-            // Yazıyor... ibaresini kaldır
             messagesEl.removeChild(typingDiv);
 
             if(data.success) {
@@ -450,7 +454,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Tıklama veya Enter'a basınca gönder
     sendBtn.addEventListener('click', sendMessage);
     inputEl.addEventListener('keypress', function(e) {
         if(e.key === 'Enter') sendMessage();
@@ -460,43 +463,37 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // CSRF Token'ı sayfadaki mevcut formların içinden bulalım
     const csrfInput = document.querySelector('input[name="csrf_token"]');
     const csrfToken = csrfInput ? csrfInput.value : '';
 
-    // Tüm faydalı butonlarını seç
     const helpfulButtons = document.querySelectorAll('.helpful-btn');
 
     helpfulButtons.forEach(button => {
         button.addEventListener('click', function(e) {
-            e.preventDefault(); // Sayfa yenilenmesini engelle
+            e.preventDefault();
             
             const reviewId = this.getAttribute('data-review-id');
             const countSpan = this.querySelector('.helpful-count');
             
-            // Flask'taki rotanıza istek atıyoruz
-            fetch(`/review/${reviewId}/helpful`, {
+            fetch(`/hotels/review/${reviewId}/helpful`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest', // Flask'ın AJAX isteği olduğunu anlaması için
-                    'X-CSRFToken': csrfToken // Güvenlik token'ı
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrfToken
                 }
             })
             .then(response => response.json())
             .then(data => {
                 if(data.success) {
-                    // Sayacı 1 artır
                     let currentCount = parseInt(countSpan.textContent) || 0;
                     countSpan.textContent = currentCount + 1;
                     
-                    // Butonu devre dışı bırak (tekrar basılmasın)
                     this.disabled = true;
                     this.style.opacity = '0.6';
                     this.style.cursor = 'not-allowed';
                     this.innerHTML = `👍 Faydalı Buldunuz (<span class="helpful-count">${currentCount + 1}</span>)`;
                 } else {
-                    // Hata varsa kullanıcıya göster (Örn: "Zaten oyladınız")
                     alert(data.message);
                 }
             })
@@ -506,6 +503,47 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const aiBtn = document.getElementById('ai-summary-btn');
+    const summaryBox = document.getElementById('ai-summary-box');
+    const summaryContent = document.getElementById('ai-summary-content');
+
+    if(aiBtn) {
+        aiBtn.addEventListener('click', async () => {
+            // Butonu kilitle ve yükleniyor ekranını göster
+            aiBtn.disabled = true;
+            aiBtn.innerHTML = '⏳ Özetleniyor...';
+            summaryBox.style.display = 'block';
+            
+            try {
+                // Backend rotasına GET isteği at
+                const response = await fetch(`/hotels/{{ hotel.id }}/summarize-reviews`);
+                const data = await response.json();
+
+                if(data.success) {
+                    // Gemini'den dönen markdown **kalın** formatını HTML <strong> etiketine çevir ve satır atlamalarını ayarla
+                    let formattedText = data.summary
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\n/g, '<br>');
+                        
+                    summaryContent.innerHTML = formattedText;
+                    aiBtn.innerHTML = '✨ Özet Güncellendi';
+                } else {
+                    summaryContent.innerHTML = `<span style="color: #e11d48;">Hata: ${data.message}</span>`;
+                    aiBtn.disabled = false;
+                    aiBtn.innerHTML = '✨ Yeniden Dene';
+                }
+            } catch (error) {
+                console.error("Özet çekilirken hata:", error);
+                summaryContent.innerHTML = '<span style="color: #e11d48;">Bağlantı hatası oluştu. Lütfen sayfayı yenileyip tekrar deneyin.</span>';
+                aiBtn.disabled = false;
+                aiBtn.innerHTML = '✨ Yeniden Dene';
+            }
+        });
+    }
 });
 </script>
 

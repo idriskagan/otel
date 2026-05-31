@@ -5,6 +5,7 @@ from app.services.reservation_service import ReservationService
 from app.services.review_service import ReviewService
 from app.forms.reservation_forms import ReservationForm
 from app.services.chatbot_service import ChatbotService
+from app.services.summarize_service import SummarizeService
 
 hotel_bp = Blueprint('hotel', __name__, url_prefix='/hotels')
 
@@ -12,6 +13,7 @@ hotel_service = HotelService()
 reservation_service = ReservationService()
 review_service = ReviewService()
 chatbot_service = ChatbotService()
+summarize_service = SummarizeService()
 
 @hotel_bp.route('/')
 def list_hotels():
@@ -203,3 +205,32 @@ def hotel_chatbot(hotel_id):
         # Eğer success False dönerse, response_message içinde hata detayı vardır
         status_code = 404 if "bulunamadı" in response_message else 500
         return jsonify({'success': False, 'message': response_message}), status_code
+    
+# app/routes/hotel.py dosyasının en altına eklenecek:
+
+@hotel_bp.route('/<int:hotel_id>/summarize-reviews', methods=['GET'])
+def summarize_hotel_reviews(hotel_id):
+    """OTEL-AI-2: Otel yorumlarını yapay zeka ile özetler."""
+    
+    # 1. Oteli bul
+    hotel = hotel_service.hotel_repo.get_by_id(hotel_id)
+    if not hotel:
+        return jsonify({'success': False, 'message': 'Otel bulunamadı.'}), 404
+
+    # 2. Yorum metinlerini çıkar (Yalnızca metinleri listeye alıyoruz)
+    # Modelinizde 'hotel.reviews' ilişkisi (relationship) olduğunu varsayıyoruz
+    if not hasattr(hotel, 'reviews') or not hotel.reviews:
+        return jsonify({'success': False, 'message': 'Henüz hiç yorum yapılmamış.'}), 404
+        
+    comments = [review.comment for review in hotel.reviews]
+    
+    if not comments:
+        return jsonify({'success': False, 'message': 'Özetlenecek yorum bulunamadı.'}), 404
+
+    # 3. Servisi çağır ve sonucu dön
+    success, summary_text = summarize_service.summarize_reviews(hotel.name, comments)
+    
+    if success:
+        return jsonify({'success': True, 'summary': summary_text})
+    else:
+        return jsonify({'success': False, 'message': summary_text}), 500
