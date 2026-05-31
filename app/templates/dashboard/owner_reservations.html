@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ hotel.name }} Rezervasyon Talepleri — StayFinder{% endblock %}
+
+{% block content %}
+<div class="page-header" style="text-align: left; background: var(--bg-card); padding-bottom: var(--space-8);">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1 style="margin-bottom: var(--space-2);">Rezervasyon Talepleri</h1>
+            <p style="color: var(--text-muted);">{{ hotel.name }} için gelen talepleri yönetin.</p>
+        </div>
+        <a href="{{ url_for('hotel_owner.dashboard') }}" class="btn btn-outline">Panele Dön</a>
+    </div>
+</div>
+
+<section class="section" style="padding-top: var(--space-8);">
+    <div class="container">
+        
+        <div style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead style="background: rgba(15, 23, 42, 0.5); border-bottom: 1px solid var(--border);">
+                    <tr>
+                        <th style="padding: var(--space-4); color: var(--text-muted); font-size: var(--font-sm);">Müşteri</th>
+                        <th style="padding: var(--space-4); color: var(--text-muted); font-size: var(--font-sm);">Giriş - Çıkış</th>
+                        <th style="padding: var(--space-4); color: var(--text-muted); font-size: var(--font-sm);">Oda & Kişi</th>
+                        <th style="padding: var(--space-4); color: var(--text-muted); font-size: var(--font-sm);">Toplam Fiyat</th>
+                        <th style="padding: var(--space-4); color: var(--text-muted); font-size: var(--font-sm);">Durum</th>
+                        <th style="padding: var(--space-4); color: var(--text-muted); font-size: var(--font-sm); text-align: right;">Aksiyon</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for res in reservations %}
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: var(--space-4);">
+                            <strong>{{ res.user.first_name }} {{ res.user.last_name }}</strong><br>
+                            <span style="font-size: var(--font-sm); color: var(--text-muted);">{{ res.user.email }}</span>
+                        </td>
+                        <td style="padding: var(--space-4);">
+                            {{ res.check_in.strftime('%d.%m.%Y') }} <br>
+                            <span style="color: var(--text-muted);">⬇</span><br>
+                            {{ res.check_out.strftime('%d.%m.%Y') }}
+                        </td>
+                        <td style="padding: var(--space-4);">
+                            {{ res.room_type.name }}<br>
+                            <span style="font-size: var(--font-sm); color: var(--text-muted);">{{ res.guests }} Kişi</span>
+                        </td>
+                        <td style="padding: var(--space-4); font-weight: bold; color: var(--primary-light);">
+                            {{ res.total_price }} ₺
+                        </td>
+                        <td style="padding: var(--space-4);">
+                            {% if res.status == 'pending' %}
+                                <span style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; padding: 4px 8px; border-radius: 4px; font-size: var(--font-xs); font-weight: bold;">BEKLİYOR</span>
+                            {% elif res.status == 'approved' %}
+                                <span style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 8px; border-radius: 4px; font-size: var(--font-xs); font-weight: bold;">ONAYLANDI</span>
+                            {% elif res.status == 'rejected' %}
+                                <span style="background: rgba(225, 29, 72, 0.1); color: #e11d48; padding: 4px 8px; border-radius: 4px; font-size: var(--font-xs); font-weight: bold;">REDDEDİLDİ</span>
+                            {% else %}
+                                <span style="background: rgba(100, 116, 139, 0.1); color: #64748b; padding: 4px 8px; border-radius: 4px; font-size: var(--font-xs); font-weight: bold;">İPTAL EDİLDİ</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: var(--space-4); text-align: right;">
+                            {% if res.status == 'pending' %}
+                                <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                                    <form action="{{ url_for('hotel_owner.approve_reservation', reservation_id=res.id) }}" method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-primary btn-sm" style="background: #10b981; border-color: #10b981; padding: 4px 12px;">✅ Onayla</button>
+                                    </form>
+                                    
+                                    <form action="{{ url_for('hotel_owner.reject_reservation', reservation_id=res.id) }}" method="POST" onsubmit="return confirm('Bu rezervasyonu reddetmek istediğinize emin misiniz?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-outline btn-sm" style="color: #e11d48; border-color: #e11d48; padding: 4px 12px;">❌ Reddet</button>
+                                    </form>
+                                </div>
+                            {% else %}
+                                <span style="color: var(--text-muted); font-size: var(--font-sm);">İşlem Yapıldı</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" style="padding: var(--space-8); text-align: center; color: var(--text-muted);">
+                            Bu otel için henüz bir rezervasyon talebi bulunmuyor.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
