@@ -7,6 +7,8 @@ Yapay Zeka Destekli Otel Kiralama Sistemi
 ![Flask](https://img.shields.io/badge/Flask-3.x-000000?logo=flask&logoColor=white)
 ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-ORM-red)
 ![License](https://img.shields.io/badge/license-MIT-green)
+![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=github-actions&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Hub-2496ED?logo=docker&logoColor=white)
 
 ---
 
@@ -165,6 +167,94 @@ main ← develop ← feature/OTEL-XX-aciklama
 
 ---
 
-## 📄 Lisans
+## � Docker ile Çalıştırma
+
+### Docker Hub'dan Çekme
+```bash
+docker pull <docker-hub-kullaniciadiniz>/otel-rezervasyon:latest
+```
+
+### Docker ile Çalıştırma
+```bash
+docker run -d \
+  --name otel-app \
+  -p 5000:5000 \
+  -e FLASK_ENV=production \
+  -e SECRET_KEY="uretim-gizli-anahtari" \
+  -e DATABASE_URL="sqlite:///otel.db" \
+  <docker-hub-kullaniciadiniz>/otel-rezervasyon:latest
+```
+
+### Docker Compose ile Çalıştırma
+```bash
+docker compose up -d
+```
+
+---
+
+## 🔄 CI/CD Pipeline
+
+Bu proje, **`main`** ve **`development`** branchlerine push yapıldığında devreye giren **GitHub Actions** tabanlı bir CI/CD pipeline'ına sahiptir.
+
+### Pipeline Akışı
+
+```mermaid
+graph TD
+    subgraph Triggers["🔀 Branches"]
+        M[main] 
+        D[development]
+    end
+
+    subgraph CI["🧪 CI - Test & Quality"]
+        L[flake8 lint]
+        T[pytest tests]
+    end
+
+    subgraph CD["🐳 CD - Docker Build & Push"]
+        B[Build Image]
+        P[Push to Docker Hub]
+    end
+
+    M --> CI
+    D --> CI
+    CI --> CD
+    CD --> H[(Docker Hub)]
+```
+
+| Aşama | Açıklama |
+|-------|----------|
+| **Tetikleyiciler** | `main` ve `development` branchlerine push, ayrıca bu branchlere açılan PR'lar |
+| **CI (Sürekli Entegrasyon)** | Python kurulumu → bağımlılıklar → flake8 lint → pytest çalıştırma |
+| **CD (Sürekli Dağıtım)** | Docker Buildx ile multi-platform build → Docker Hub'a push |
+
+### Branch Bazlı Etiket Stratejisi
+
+| Branch | Docker Etiketleri | Kullanım |
+|--------|-------------------|----------|
+| **`main`** | `latest`, `main`, `sha-<hash>`, `<run>` | Üretim (production) |
+| **`development`** | `dev`, `development`, `sha-<hash>`, `<run>` | Test / Staging |
+
+```bash
+# Production (main branch)
+docker pull <kullanici>/otel-rezervasyon:latest
+
+# Development (development branch)
+docker pull <kullanici>/otel-rezervasyon:dev
+```
+
+### GitHub Secrets Konfigürasyonu
+
+Pipeline'ın çalışması için GitHub repository ayarlarına şu **secrets** (sırlar) eklenmelidir:
+
+| Secret Adı | Açıklama | Nereden Alınır? |
+|-----------|----------|-----------------|
+| `DOCKER_HUB_USERNAME` | Docker Hub kullanıcı adınız | [hub.docker.com](https://hub.docker.com) |
+| `DOCKER_HUB_TOKEN` | Docker Hub Access Token | Account Settings → Security → New Access Token |
+
+> **⚠️ Önemli:** Docker Hub şifrenizi değil, **Access Token** kullanın! Token oluştururken **Read, Write, Delete** izinlerini verin.
+
+---
+
+## �📄 Lisans
 
 Bu proje MIT Lisansı altında lisanslanmıştır.

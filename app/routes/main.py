@@ -17,3 +17,10 @@ def index():
 def about():
     """Hakkında sayfası."""
     return render_template('main/about.html')
+
+
+@main_bp.route('/health')
+def health():
+    """Docker HEALTHCHECK için sağlık kontrolü endpoint'i."""
+    from flask import jsonify
+    return jsonify({"status": "healthy", "app": "StayFinder"}), 200
