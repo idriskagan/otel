@@ -30,6 +30,12 @@ def create_app(config_name=None):
     # User loader callback
     _register_user_loader()
 
+    # --- EKLENEN KISIM BURASI ---
+    # Uygulama ayağa kalkarken tabloları kontrol et ve yoksa Neon üzerinde otomatik oluştur
+    with app.app_context():
+        db.create_all()
+    # ----------------------------
+
     return app
 
 

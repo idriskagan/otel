@@ -1,5 +1,13 @@
 import os
 
+# 1. ORTAM DEĞİŞKENİNİ AL VE DÜZELT
+# Render veya Neon'dan gelen DATABASE_URL'i okuyoruz.
+database_url = os.environ.get('DATABASE_URL')
+
+# Eğer bir URL varsa ve 'postgres://' ile başlıyorsa, bunu SQLAlchemy için düzeltiyoruz.
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
 
 class Config:
     """Base configuration."""
@@ -14,18 +22,22 @@ class Config:
 class DevelopmentConfig(Config):
     """Development configuration."""
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///otel.db')
+    # 2. DÜZELTİLMİŞ URL'İ KULLAN
+    # Eğer ortamda DATABASE_URL varsa onu (Neon) kullan, yoksa lokaldeki (otel.db) ile devam et.
+    SQLALCHEMY_DATABASE_URI = database_url or 'sqlite:///otel.db'
 
 
 class ProductionConfig(Config):
     """Production configuration."""
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    # Canlı ortamda sadece düzeltilmiş PostgreSQL URL'ini kullanır.
+    SQLALCHEMY_DATABASE_URI = database_url
 
 
 class TestingConfig(Config):
     """Testing configuration."""
     TESTING = True
+    # Testler sırasında hafızada çalışan hızlı ve geçici bir SQLite kullanmaya devam eder.
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     WTF_CSRF_ENABLED = False
 
