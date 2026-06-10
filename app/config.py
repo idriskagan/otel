@@ -8,6 +8,7 @@ class Config:
     UPLOAD_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static', 'uploads')
     MAX_CONTENT_LENGTH = int(os.environ.get('MAX_CONTENT_LENGTH', 16 * 1024 * 1024))  # 16MB
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
+    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 
 
 class DevelopmentConfig(Config):
