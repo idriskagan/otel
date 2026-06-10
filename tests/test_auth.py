@@ -43,5 +43,6 @@ class AuthUnitTestCase(unittest.TestCase):
         
         # 400 hatasından kurtulup 200 veya 302 görmeyi bekliyoruz
         self.assertIn(response.status_code, [200, 201, 302])
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
