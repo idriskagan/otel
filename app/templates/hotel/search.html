@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Arama Sonuçları — StayFinder{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1>Arama Sonuçları</h1>
+        <p>"{{ city or 'Tüm Şehirler' }}" için arama yapıldı.</p>
+    </div>
+</div>
+
+<section class="section">
+    <div class="container" style="display: grid; grid-template-columns: 280px 1fr; gap: var(--space-8);">
+        
+        <!-- Filtre Paneli -->
+        <aside class="filter-panel" style="background: var(--bg-card); padding: var(--space-6); border-radius: var(--radius-lg); border: 1px solid var(--border); height: fit-content;">
+            <h3 style="margin-bottom: var(--space-4);">Aramayı Daralt</h3>
+            <form action="{{ url_for('hotel.search') }}" method="GET" class="auth-form">
+                <div class="form-group">
+                    <label>Şehir</label>
+                    <input type="text" name="city" class="form-control" value="{{ city or '' }}">
+                </div>
+                <div class="form-group">
+                    <label>Minimum Yıldız</label>
+                    <select name="stars" class="form-control select-control">
+                        <option value="" {% if not stars %}selected{% endif %}>Tümü</option>
+                        <option value="3" {% if stars == 3 %}selected{% endif %}>3 Yıldız ve üzeri</option>
+                        <option value="4" {% if stars == 4 %}selected{% endif %}>4 Yıldız ve üzeri</option>
+                        <option value="5" {% if stars == 5 %}selected{% endif %}>5 Yıldız</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: var(--space-4);">Uygula</button>
+            </form>
+        </aside>
+
+        <!-- Otel Grid -->
+        <div class="hotels-container">
+            {% if hotels %}
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--space-6);">
+                    {% for hotel in hotels %}
+                        {% include 'components/hotel_card.html' %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: var(--space-12); background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border);">
+                    <h3 style="margin-bottom: var(--space-2);">Otel Bulunamadı</h3>
+                    <p class="text-muted">Arama kriterlerinize uygun otel bulunmamaktadır.</p>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+</section>
+{% endblock %}

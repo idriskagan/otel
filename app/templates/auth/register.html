@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Kayıt Ol — StayFinder{% endblock %}
+
+{% block content %}
+<section class="section auth-section">
+    <div class="container auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2>Hesap Oluşturun</h2>
+                <p>Aramıza katılın ve avantajlardan yararlanın.</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('auth.register') }}" class="auth-form">
+                {{ form.hidden_tag() }}
+                
+                <div class="form-group">
+                    {{ form.username.label }}
+                    {{ form.username(class="form-control", placeholder="Kullanıcı adınız") }}
+                    {% if form.username.errors %}
+                        <div class="form-error">
+                            {% for error in form.username.errors %}<span>{{ error }}</span>{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.email.label }}
+                    {{ form.email(class="form-control", placeholder="ornek@email.com") }}
+                    {% if form.email.errors %}
+                        <div class="form-error">
+                            {% for error in form.email.errors %}<span>{{ error }}</span>{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half-width">
+                        {{ form.password.label }}
+                        {{ form.password(class="form-control", placeholder="En az 6 karakter") }}
+                        {% if form.password.errors %}
+                            <div class="form-error">
+                                {% for error in form.password.errors %}<span>{{ error }}</span>{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group half-width">
+                        {{ form.confirm_password.label }}
+                        {{ form.confirm_password(class="form-control", placeholder="Şifrenizi doğrulayın") }}
+                        {% if form.confirm_password.errors %}
+                            <div class="form-error">
+                                {% for error in form.confirm_password.errors %}<span>{{ error }}</span>{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    {{ form.role.label }}
+                    {{ form.role(class="form-control select-control") }}
+                    {% if form.role.errors %}
+                        <div class="form-error">
+                            {% for error in form.role.errors %}<span>{{ error }}</span>{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-submit mt-4">
+                    {{ form.submit(class="btn btn-primary btn-block") }}
+                </div>
+            </form>
+
+            <div class="auth-footer">
+                <p>Zaten hesabınız var mı? <a href="{{ url_for('auth.login') }}">Giriş Yapın</a></p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

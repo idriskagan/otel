@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin - Kullanıcı Yönetimi — StayFinder{% endblock %}
+
+{% block content %}
+<div class="page-header" style="text-align: left; background: var(--bg-card); padding-bottom: var(--space-8);">
+    <div class="container">
+        <h1>Kullanıcı Yönetimi</h1>
+        <p>Sistemdeki tüm kullanıcıları görebilir ve hesap durumlarını (Aktif/Pasif) değiştirebilirsiniz.</p>
+    </div>
+</div>
+
+<section class="section" style="padding-top: var(--space-8);">
+    <div class="container" style="display: grid; grid-template-columns: 250px 1fr; gap: var(--space-8);">
+        
+        <!-- Sidebar -->
+        <aside style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: var(--space-4); height: fit-content;">
+            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-2);">
+                <li>
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline" style="width: 100%; justify-content: flex-start; text-align: left; border: none;">
+                        Gösterge Paneli
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin.hotels') }}" class="btn btn-outline" style="width: 100%; justify-content: flex-start; text-align: left; border: none;">
+                        Otel Yönetimi
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin.users') }}" class="btn btn-primary" style="width: 100%; justify-content: flex-start; text-align: left;">
+                        Kullanıcı Yönetimi
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- İçerik -->
+        <div>
+            <div style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead style="background: rgba(15, 23, 42, 0.5); border-bottom: 1px solid var(--border);">
+                        <tr>
+                            <th style="padding: var(--space-4); font-weight: 600; color: var(--text-muted);">ID</th>
+                            <th style="padding: var(--space-4); font-weight: 600; color: var(--text-muted);">Kullanıcı Adı</th>
+                            <th style="padding: var(--space-4); font-weight: 600; color: var(--text-muted);">E-posta</th>
+                            <th style="padding: var(--space-4); font-weight: 600; color: var(--text-muted);">Rol</th>
+                            <th style="padding: var(--space-4); font-weight: 600; color: var(--text-muted);">Durum</th>
+                            <th style="padding: var(--space-4); font-weight: 600; color: var(--text-muted); text-align: right;">İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in pagination.items %}
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: var(--space-4);">#{{ user.id }}</td>
+                            <td style="padding: var(--space-4); font-weight: 500;">{{ user.username }}</td>
+                            <td style="padding: var(--space-4);">{{ user.email }}</td>
+                            <td style="padding: var(--space-4); text-transform: capitalize;">{{ user.role }}</td>
+                            <td style="padding: var(--space-4);">
+                                {% if user.is_active %}
+                                    <span style="color: var(--success); font-size: var(--font-sm); font-weight: bold;">Aktif</span>
+                                {% else %}
+                                    <span style="color: var(--danger); font-size: var(--font-sm); font-weight: bold;">Pasif</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding: var(--space-4); text-align: right;">
+                                {% if current_user.id != user.id %}
+                                <form action="{{ url_for('admin.toggle_user', user_id=user.id) }}" method="POST" style="display: inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    {% if user.is_active %}
+                                        <button type="submit" class="btn btn-outline" style="padding: var(--space-1) var(--space-3); font-size: var(--font-xs); color: var(--danger); border-color: var(--danger);">Pasif Yap</button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-outline" style="padding: var(--space-1) var(--space-3); font-size: var(--font-xs); color: var(--success); border-color: var(--success);">Aktif Yap</button>
+                                    {% endif %}
+                                </form>
+                                {% else %}
+                                    <span style="color: var(--text-muted); font-size: var(--font-xs);">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" style="padding: var(--space-8); text-align: center; color: var(--text-muted);">Kullanıcı bulunamadı.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Sayfalama -->
+            <div style="margin-top: var(--space-6); display: flex; justify-content: center; gap: var(--space-2);">
+                {% for p in pagination.iter_pages() %}
+                    {% if p %}
+                        <a href="{{ url_for('admin.users', page=p) }}" class="btn {% if p == pagination.page %}btn-primary{% else %}btn-outline{% endif %}" style="padding: var(--space-1) var(--space-3);">{{ p }}</a>
+                    {% else %}
+                        <span style="align-self: flex-end;">...</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

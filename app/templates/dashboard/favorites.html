@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Favorilerim — StayFinder{% endblock %}
+
+{% block content %}
+<div class="page-header" style="text-align: left; background: var(--bg-card); padding-bottom: var(--space-8);">
+    <div class="container">
+        <h1>Favorilerim</h1>
+        <p>İstek listenize eklediğiniz oteller.</p>
+    </div>
+</div>
+
+<section class="section" style="padding-top: var(--space-8);">
+    <div class="container" style="display: grid; grid-template-columns: 250px 1fr; gap: var(--space-8);">
+        
+        <!-- Sidebar -->
+        <aside style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: var(--space-4); height: fit-content;">
+            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-2);">
+                <li>
+                    <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline" style="width: 100%; justify-content: flex-start; text-align: left; border: none;">
+                        Profilim
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('dashboard.favorites') }}" class="btn btn-primary" style="width: 100%; justify-content: flex-start; text-align: left;">
+                        Favorilerim
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('dashboard.reservations') }}" class="btn btn-outline" style="width: 100%; justify-content: flex-start; text-align: left; border: none;">
+                        Rezervasyonlarım
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- İçerik -->
+        <div>
+            {% if hotels %}
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-6);">
+                    {% for hotel in hotels %}
+                        {% include 'components/hotel_card.html' %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: var(--space-8); text-align: center;">
+                    <h3 style="margin-bottom: var(--space-2);">Henüz favori oteliniz yok</h3>
+                    <p style="color: var(--text-muted); margin-bottom: var(--space-6);">İlgilendiğiniz otelleri favorilerinize ekleyerek daha sonra kolayca bulabilirsiniz.</p>
+                    <a href="{{ url_for('hotel.list') }}" class="btn btn-primary">Otelleri Keşfet</a>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,550 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ hotel.name }} — StayFinder{% endblock %}
+
+{% block content %}
+<div class="page-header" style="text-align: left; background: var(--bg-card); padding-bottom: var(--space-8);">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+            <h1 style="margin-bottom: var(--space-2);">{{ hotel.name }}</h1>
+            <div style="display: flex; gap: var(--space-4); color: var(--text-muted); align-items: center;">
+                <span><i class="icon">📍</i> {{ hotel.city }}</span>
+                <span><i class="icon">⭐</i> {{ hotel.star_rating }} Yıldız</span>
+                {% if hotel.review_count > 0 %}
+                <span><i class="icon">💬</i> {{ hotel.average_rating }} / 5 ({{ hotel.review_count }} Değerlendirme)</span>
+                {% endif %}
+            </div>
+        </div>
+        {% if current_user.is_authenticated %}
+        <button class="btn btn-outline favorite-toggle" data-hotel-id="{{ hotel.id }}" style="display: flex; align-items: center; gap: var(--space-2); color: {% if current_user.favorites.filter_by(hotel_id=hotel.id).first() %}#e11d48{% else %}var(--text-muted){% endif %}; border-color: currentColor;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            <span class="favorite-text">{% if current_user.favorites.filter_by(hotel_id=hotel.id).first() %}Favorilerden Çıkar{% else %}Favorilere Ekle{% endif %}</span>
+        </button>
+        {% endif %}
+    </div>
+</div>
+
+<section class="section" style="padding-top: var(--space-8);">
+    <div class="container">
+        
+        <div class="hotel-gallery" style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-4); margin-bottom: 80px; height: 450px; position: relative; clear: both;">
+            <div class="main-image" style="background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; height: 100%;">
+                {% if hotel.primary_image %}
+                    <img src="{{ url_for('static', filename=hotel.primary_image) }}" alt="{{ hotel.name }}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                {% else %}
+                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--border);">Fotoğraf Yok</div>
+                {% endif %}
+            </div>
+            <div class="side-images" style="display: grid; grid-template-rows: 1fr 1fr; gap: var(--space-4); height: 100%;">
+                {% for img in hotel.images.all()[1:3] %}
+                    <div style="background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; height: 100%;">
+                        <img src="{{ url_for('static', filename=img.image_path) }}" alt="{{ hotel.name }}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-8); position: relative; clear: both;">
+            
+            <div>
+                <h2 style="margin-bottom: var(--space-4);">Otel Hakkında</h2>
+                <p style="color: var(--text-muted); margin-bottom: var(--space-8); white-space: pre-wrap;">{{ hotel.description or 'Açıklama bulunmuyor.' }}</p>
+
+                <h2 style="margin-bottom: var(--space-4);">Oda Tipleri</h2>
+                <div style="display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-8);">
+                    {% for room in hotel.room_types %}
+                        <div style="background: var(--bg-card); border: 1px solid var(--border); padding: var(--space-4); border-radius: var(--radius-lg); display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4 style="font-size: var(--font-lg); color: var(--text-heading);">{{ room.name }}</h4>
+                                <p style="color: var(--text-muted); font-size: var(--font-sm);">Kapasite: {{ room.capacity }} Kişi | Toplam: {{ room.total_rooms }} Oda</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: var(--font-xl); font-weight: bold; color: var(--primary-light);">{{ room.price_per_night }} ₺ <span style="font-size: var(--font-sm); font-weight: normal; color: var(--text-muted);">/ gece</span></div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Bu otele ait oda tipi bulunmuyor.</p>
+                    {% endfor %}
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--space-4);">
+                    <div style="display: flex; align-items: center; gap: var(--space-4);">
+                        <h2 style="margin: 0;">Yorumlar</h2>
+                        {% if hotel.review_count > 0 %}
+                        <button id="ai-summary-btn" class="btn btn-outline" style="padding: 4px 12px; font-size: var(--font-sm); border-color: #8b5cf6; color: #8b5cf6; display: flex; align-items: center; gap: 8px;">
+                            ✨ AI ile Özetle
+                        </button>
+                        {% endif %}
+                    </div>
+    
+                    <form method="GET" action="{{ url_for('hotel.hotel_detail', hotel_id=hotel.id) }}" id="sort-reviews-form">
+                        <select name="sort_by" class="form-control select-control" onchange="document.getElementById('sort-reviews-form').submit();" style="padding: 4px 8px; font-size: var(--font-sm);">
+                            <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>En Yeni</option>
+                            <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>En Eski</option>
+                            <option value="highest" {% if sort_by == 'highest' %}selected{% endif %}>En Yüksek Puan</option>
+                            <option value="lowest" {% if sort_by == 'lowest' %}selected{% endif %}>En Düşük Puan</option>
+                        </select>
+                    </form>
+                </div>
+
+                <div id="ai-summary-box" style="display: none; background: linear-gradient(to right, rgba(139, 92, 246, 0.1), transparent); border-left: 4px solid #8b5cf6; padding: var(--space-6); margin-bottom: var(--space-8); border-radius: 0 var(--radius-lg) var(--radius-lg) 0;">
+                    <div style="font-weight: bold; color: #8b5cf6; margin-bottom: var(--space-4); display: flex; align-items: center; gap: 8px;">
+                        🤖 Yapay Zeka Müşteri Değerlendirme Özeti
+                    </div>
+                    <div id="ai-summary-content" style="font-size: var(--font-sm); line-height: 1.6; color: var(--text-heading);">
+                        Yorumlar okunuyor ve analiz ediliyor... Lütfen bekleyin.
+                    </div>
+                </div>
+                
+                {% if current_user.is_authenticated %}
+                    <form action="{{ url_for('hotel.review', hotel_id=hotel.id) }}" method="POST" class="auth-form" style="background: var(--bg-card); padding: var(--space-6); border-radius: var(--radius-lg); border: 1px solid var(--border); margin-bottom: var(--space-8);">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <h4 style="margin-bottom: var(--space-4);">Yorum Bırak</h4>
+                        <div class="form-group">
+                            <label>Puanınız</label>
+                            <select name="rating" class="form-control select-control" required>
+                                <option value="5">5 - Mükemmel</option>
+                                <option value="4">4 - Çok İyi</option>
+                                <option value="3">3 - İyi</option>
+                                <option value="2">2 - İdare Eder</option>
+                                <option value="1">1 - Kötü</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Yorumunuz</label>
+                            <textarea name="comment" class="form-control" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="margin-top: var(--space-4);">Yorum Gönder</button>
+                    </form>
+                {% else %}
+                    <div style="background: var(--bg-card); padding: var(--space-4); border-radius: var(--radius-lg); border: 1px solid var(--border); margin-bottom: var(--space-8); text-align: center;">
+                        <p style="margin-bottom: var(--space-2);">Yorum yapmak için giriş yapmalısınız.</p>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Giriş Yap</a>
+                    </div>
+                {% endif %}
+
+                <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+                    {% for review in reviews_data.reviews %}
+                        <div style="background: var(--bg-card); border: 1px solid var(--border); padding: var(--space-6); border-radius: var(--radius-lg);">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
+                                <strong>{{ review.user.first_name or review.user.username }}</strong>
+                                <span style="color: var(--secondary);">{{ '⭐' * review.rating }}</span>
+                            </div>
+                            <p style="color: var(--text-muted); font-size: var(--font-sm); margin-bottom: var(--space-2);">
+                                {{ review.created_at.strftime('%d.%m.%Y') }}
+                                {% if review.is_edited %} <span style="font-style: italic;">(Düzenlendi)</span> {% endif %}
+                            </p>
+                            <p style="margin-bottom: var(--space-4);">{{ review.comment }}</p>
+                            
+                            <div style="display: flex; gap: var(--space-4); align-items: center; font-size: var(--font-sm);">
+                                {% if current_user.is_authenticated %}
+                                    <button class="btn btn-outline helpful-btn" data-review-id="{{ review.id }}" style="padding: 4px 8px; font-size: var(--font-xs);">
+                                        👍 Faydalı (<span class="helpful-count">{{ review.helpful_count }}</span>)
+                                    </button>
+                                    
+                                    {% if current_user.id == review.user_id %}
+                                        <button onclick="toggleEditForm({{ review.id }})" class="btn btn-outline" style="padding: 4px 8px; font-size: var(--font-xs);">Düzenle</button>
+                                        <form action="{{ url_for('hotel.delete_review', review_id=review.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Silmek istediğinize emin misiniz?');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-outline" style="padding: 4px 8px; font-size: var(--font-xs); color: #e11d48; border-color: #e11d48;">Sil</button>
+                                        </form>
+                                    {% endif %}
+                                    
+                                    {% if current_user.id == hotel.owner_id %}
+                                        <button onclick="toggleReplyForm({{ review.id }})" class="btn btn-outline" style="padding: 4px 8px; font-size: var(--font-xs);">Yanıtla</button>
+                                    {% endif %}
+                                {% else %}
+                                    <span style="color: var(--text-muted);">👍 {{ review.helpful_count }} kişi faydalı buldu</span>
+                                {% endif %}
+                            </div>
+
+                            {% if current_user.is_authenticated and current_user.id == review.user_id %}
+                            <form id="edit-form-{{ review.id }}" action="{{ url_for('hotel.edit_review', review_id=review.id) }}" method="POST" class="auth-form" style="display: none; margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px dashed var(--border);">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="form-group">
+                                    <select name="rating" class="form-control select-control" required style="padding: 4px 8px; font-size: var(--font-sm);">
+                                        <option value="5" {% if review.rating == 5 %}selected{% endif %}>5 - Mükemmel</option>
+                                        <option value="4" {% if review.rating == 4 %}selected{% endif %}>4 - Çok İyi</option>
+                                        <option value="3" {% if review.rating == 3 %}selected{% endif %}>3 - İyi</option>
+                                        <option value="2" {% if review.rating == 2 %}selected{% endif %}>2 - İdare Eder</option>
+                                        <option value="1" {% if review.rating == 1 %}selected{% endif %}>1 - Kötü</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <textarea name="comment" class="form-control" rows="2" required>{{ review.comment }}</textarea>
+                                </div>
+                                <div style="display: flex; gap: var(--space-2);">
+                                    <button type="submit" class="btn btn-primary btn-sm">Kaydet</button>
+                                    <button type="button" class="btn btn-outline btn-sm" onclick="toggleEditForm({{ review.id }})">İptal</button>
+                                </div>
+                            </form>
+                            {% endif %}
+
+                            {% if current_user.is_authenticated and current_user.id == hotel.owner_id %}
+                            <form id="reply-form-{{ review.id }}" action="{{ url_for('hotel.reply_review', review_id=review.id) }}" method="POST" class="auth-form" style="display: none; margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px dashed var(--border);">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="form-group">
+                                    <textarea name="comment" class="form-control" rows="2" placeholder="Yanıtınız..." required></textarea>
+                                </div>
+                                <div style="display: flex; gap: var(--space-2);">
+                                    <button type="submit" class="btn btn-primary btn-sm">Yanıt Gönder</button>
+                                    <button type="button" class="btn btn-outline btn-sm" onclick="toggleReplyForm({{ review.id }})">İptal</button>
+                                </div>
+                            </form>
+                            {% endif %}
+
+                            {% if review.replies.count() > 0 %}
+                            <div style="margin-top: var(--space-4); padding-left: var(--space-6); border-left: 2px solid var(--border);">
+                                {% for reply in review.replies %}
+                                    <div style="margin-top: var(--space-4);">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
+                                            <strong>{{ hotel.name }} (Otel Sahibi)</strong>
+                                            <span style="color: var(--text-muted); font-size: var(--font-sm);">{{ reply.created_at.strftime('%d.%m.%Y') }}</span>
+                                        </div>
+                                        <p>{{ reply.comment }}</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Henüz yorum yapılmamış.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div>
+                <div style="position: sticky; top: 100px; background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); padding: var(--space-6); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg);">
+                    <h3 style="margin-bottom: var(--space-4); font-size: var(--font-2xl);">Rezervasyon Yap</h3>
+                    <form action="{{ url_for('hotel.reserve', hotel_id=hotel.id) }}" method="POST" class="auth-form">
+                        {{ form.csrf_token }}
+                        <div class="form-group">
+                            {{ form.check_in.label }}
+                            {{ form.check_in(class="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.check_out.label }}
+                            {{ form.check_out(class="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.guests.label }}
+                            {{ form.guests(class="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            <label>Oda Tipi Seçin</label>
+                            <select name="room_type_id" class="form-control select-control" required>
+                                <option value="">Oda seçiniz...</option>
+                                {% for room in hotel.room_types %}
+                                    <option value="{{ room.id }}">{{ room.name }} ({{ room.price_per_night }} ₺/gece)</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% if current_user.is_authenticated %}
+                            {{ form.submit(class="btn btn-primary btn-block", style="margin-top: var(--space-6);") }}
+                        {% else %}
+                            <div style="margin-top: var(--space-6); text-align: center;">
+                                <p style="margin-bottom: var(--space-2); font-size: var(--font-sm); color: var(--text-muted);">Rezervasyon için giriş yapmalısınız.</p>
+                                <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-block">Giriş Yap</a>
+                            </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<button id="chatbot-toggle-btn" class="chatbot-toggle-btn">
+    💬 Otel Asistanına Sor
+</button>
+
+<div id="chatbot-window" class="chatbot-window" style="display: none;">
+    <div class="chatbot-header">
+        <div class="chatbot-title">
+            🤖 {{ hotel.name }} Asistanı
+        </div>
+        <button id="chatbot-close-btn" class="chatbot-close-btn">✖</button>
+    </div>
+    
+    <div id="chatbot-messages" class="chatbot-messages">
+        <div class="chat-msg bot-msg">
+            Merhaba! Ben bu otelin yapay zeka asistanıyım. Size odalar, kurallar veya hizmetlerimiz hakkında nasıl yardımcı olabilirim?
+        </div>
+    </div>
+    
+    <div class="chatbot-input-area">
+        <input type="text" id="chatbot-input" placeholder="Bir soru sorun..." autocomplete="off">
+        <button id="chatbot-send-btn" class="btn btn-primary" style="padding: 0 16px;">Gönder</button>
+    </div>
+</div>
+
+<style>
+    .chatbot-toggle-btn {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 12px 24px;
+        font-weight: bold;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        cursor: pointer;
+        z-index: 1000;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .chatbot-toggle-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+    }
+    
+    .chatbot-window {
+        position: fixed;
+        bottom: 85px;
+        right: 24px;
+        width: 350px;
+        height: 450px;
+        background-color: var(--bg-card, #1e293b);
+        border: 1px solid var(--border, #334155);
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        display: flex;
+        flex-direction: column;
+        z-index: 1000;
+        overflow: hidden;
+    }
+    
+    .chatbot-header {
+        background-color: rgba(15, 23, 42, 0.95);
+        padding: 12px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border, #334155);
+    }
+    .chatbot-title { color: white; font-weight: bold; font-size: 14px; }
+    .chatbot-close-btn { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 16px; }
+    .chatbot-close-btn:hover { color: white; }
+    
+    .chatbot-messages {
+        flex: 1;
+        padding: 16px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background-color: var(--bg-body, #0f172a);
+    }
+    
+    .chat-msg {
+        max-width: 85%;
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+    .bot-msg {
+        background-color: #334155;
+        color: #f8fafc;
+        align-self: flex-start;
+        border-bottom-left-radius: 2px;
+    }
+    .user-msg {
+        background-color: #4f46e5;
+        color: white;
+        align-self: flex-end;
+        border-bottom-right-radius: 2px;
+    }
+    
+    .chatbot-input-area {
+        display: flex;
+        padding: 12px;
+        background-color: var(--bg-card, #1e293b);
+        border-top: 1px solid var(--border, #334155);
+        gap: 8px;
+    }
+    .chatbot-input-area input {
+        flex: 1;
+        background-color: #0f172a;
+        border: 1px solid #334155;
+        color: white;
+        border-radius: 6px;
+        padding: 8px 12px;
+        outline: none;
+    }
+    .chatbot-input-area input:focus { border-color: #6366f1; }
+    
+    .typing-indicator { font-style: italic; color: #94a3b8; font-size: 12px; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('chatbot-toggle-btn');
+    const windowEl = document.getElementById('chatbot-window');
+    const closeBtn = document.getElementById('chatbot-close-btn');
+    const sendBtn = document.getElementById('chatbot-send-btn');
+    const inputEl = document.getElementById('chatbot-input');
+    const messagesEl = document.getElementById('chatbot-messages');
+    
+    const csrfInput = document.querySelector('input[name="csrf_token"]');
+    const csrfToken = csrfInput ? csrfInput.value : '{{ csrf_token() if csrf_token else "" }}';
+
+    const chatApiUrl = "{{ url_for('hotel.hotel_chatbot', hotel_id=hotel.id) }}";
+
+    toggleBtn.addEventListener('click', () => {
+        windowEl.style.display = windowEl.style.display === 'none' ? 'flex' : 'none';
+        if(windowEl.style.display === 'flex') inputEl.focus();
+    });
+    closeBtn.addEventListener('click', () => windowEl.style.display = 'none');
+
+    function appendMessage(text, sender) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `chat-msg ${sender}-msg`;
+        msgDiv.textContent = text;
+        messagesEl.appendChild(msgDiv);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const text = inputEl.value.trim();
+        if(!text) return;
+
+        appendMessage(text, 'user');
+        inputEl.value = '';
+        inputEl.disabled = true;
+        sendBtn.disabled = true;
+
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'chat-msg bot-msg typing-indicator';
+        typingDiv.textContent = 'Asistan düşünüyor...';
+        messagesEl.appendChild(typingDiv);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+
+        try {
+            const response = await fetch(chatApiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ message: text })
+            });
+            
+            const data = await response.json();
+            
+            messagesEl.removeChild(typingDiv);
+
+            if(data.success) {
+                appendMessage(data.reply, 'bot');
+            } else {
+                appendMessage('Hata: ' + data.message, 'bot');
+            }
+        } catch (error) {
+            messagesEl.removeChild(typingDiv);
+            appendMessage('Bağlantı hatası oluştu, lütfen tekrar deneyin.', 'bot');
+            console.error(error);
+        } finally {
+            inputEl.disabled = false;
+            sendBtn.disabled = false;
+            inputEl.focus();
+        }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    inputEl.addEventListener('keypress', function(e) {
+        if(e.key === 'Enter') sendMessage();
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const csrfInput = document.querySelector('input[name="csrf_token"]');
+    const csrfToken = csrfInput ? csrfInput.value : '';
+
+    const helpfulButtons = document.querySelectorAll('.helpful-btn');
+
+    helpfulButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const reviewId = this.getAttribute('data-review-id');
+            const countSpan = this.querySelector('.helpful-count');
+            
+            fetch(`/hotels/review/${reviewId}/helpful`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    let currentCount = parseInt(countSpan.textContent) || 0;
+                    countSpan.textContent = currentCount + 1;
+                    
+                    this.disabled = true;
+                    this.style.opacity = '0.6';
+                    this.style.cursor = 'not-allowed';
+                    this.innerHTML = `👍 Faydalı Buldunuz (<span class="helpful-count">${currentCount + 1}</span>)`;
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('İstek hatası:', error);
+                alert("Bir hata oluştu, lütfen daha sonra tekrar deneyin.");
+            });
+        });
+    });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const aiBtn = document.getElementById('ai-summary-btn');
+    const summaryBox = document.getElementById('ai-summary-box');
+    const summaryContent = document.getElementById('ai-summary-content');
+
+    if(aiBtn) {
+        aiBtn.addEventListener('click', async () => {
+            // Butonu kilitle ve yükleniyor ekranını göster
+            aiBtn.disabled = true;
+            aiBtn.innerHTML = '⏳ Özetleniyor...';
+            summaryBox.style.display = 'block';
+            
+            try {
+                // Backend rotasına GET isteği at
+                const response = await fetch(`/hotels/{{ hotel.id }}/summarize-reviews`);
+                const data = await response.json();
+
+                if(data.success) {
+                    // Gemini'den dönen markdown **kalın** formatını HTML <strong> etiketine çevir ve satır atlamalarını ayarla
+                    let formattedText = data.summary
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\n/g, '<br>');
+                        
+                    summaryContent.innerHTML = formattedText;
+                    aiBtn.innerHTML = '✨ Özet Güncellendi';
+                } else {
+                    summaryContent.innerHTML = `<span style="color: #e11d48;">Hata: ${data.message}</span>`;
+                    aiBtn.disabled = false;
+                    aiBtn.innerHTML = '✨ Yeniden Dene';
+                }
+            } catch (error) {
+                console.error("Özet çekilirken hata:", error);
+                summaryContent.innerHTML = '<span style="color: #e11d48;">Bağlantı hatası oluştu. Lütfen sayfayı yenileyip tekrar deneyin.</span>';
+                aiBtn.disabled = false;
+                aiBtn.innerHTML = '✨ Yeniden Dene';
+            }
+        });
+    }
+});
+</script>
+
+{% endblock %}

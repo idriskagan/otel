@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}StayFinder — Hayalinizdeki Oteli Bulun{% endblock %}
+
+{% block content %}
+<section class="hero" id="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <h1 class="hero-title">Hayalinizdeki Oteli <span class="highlight">Keşfedin</span></h1>
+        <p class="hero-subtitle">Türkiye'nin dört bir yanındaki en uygun otelleri karşılaştırın ve kolayca rezervasyon yapın.</p>
+
+        <form class="hero-search" action="{{ url_for('hotel.search') }}" method="GET" id="hero-search-form">
+            <div class="search-group">
+                <label for="search-city">Şehir</label>
+                <input type="text" id="search-city" name="city" placeholder="Nereye gitmek istiyorsunuz?">
+            </div>
+            <div class="search-group">
+                <label for="search-stars">Yıldız</label>
+                <select id="search-stars" name="stars">
+                    <option value="">Tümü</option>
+                    <option value="3">3+</option>
+                    <option value="4">4+</option>
+                    <option value="5">5 Yıldız</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-search" id="btn-search">🔍 Otel Ara</button>
+        </form>
+    </div>
+</section>
+
+<section class="section stats-section" id="stats-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-number">500+</span>
+                <span class="stat-label">Kayıtlı Otel</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">81</span>
+                <span class="stat-label">Şehir</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">10K+</span>
+                <span class="stat-label">Mutlu Misafir</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">4.8</span>
+                <span class="stat-label">Ortalama Puan</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if popular_hotels %}
+<section class="section" id="popular-hotels">
+    <div class="container">
+        <h2 class="section-title">Popüler Oteller</h2>
+        <p class="section-subtitle">Misafirlerimizin en çok tercih ettiği oteller</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--space-6);">
+            {% for hotel in popular_hotels %}
+                {% include 'components/hotel_card.html' %}
+            {% endfor %}
+        </div>
+        <div style="text-align: center; margin-top: var(--space-8);">
+            <a href="{{ url_for('hotel.list_hotels') }}" class="btn btn-outline" style="padding: var(--space-3) var(--space-8);">
+                Tüm Otelleri Gör →
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% if cities %}
+<section class="section" id="popular-cities" style="background: var(--surface); border-top: 1px solid var(--border);">
+    <div class="container">
+        <h2 class="section-title">Popüler Şehirler</h2>
+        <p class="section-subtitle">En çok tercih edilen tatil destinasyonları</p>
+        <div class="cities-grid">
+            {% for city in cities[:8] %}
+            <a href="{{ url_for('hotel.search') }}?city={{ city }}" style="text-decoration: none;">
+                <div class="city-card">
+                    <div class="city-card-overlay"></div>
+                    <h3>{{ city }}</h3>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% else %}
+<section class="section" id="popular-cities" style="background: var(--surface); border-top: 1px solid var(--border);">
+    <div class="container">
+        <h2 class="section-title">Popüler Şehirler</h2>
+        <p class="section-subtitle">En çok tercih edilen tatil destinasyonları</p>
+        <div class="cities-grid">
+            {% for city_name in ['İstanbul', 'Antalya', 'İzmir', 'Muğla'] %}
+            <a href="{{ url_for('hotel.search') }}?city={{ city_name }}" style="text-decoration: none;">
+                <div class="city-card">
+                    <div class="city-card-overlay"></div>
+                    <h3>{{ city_name }}</h3>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}

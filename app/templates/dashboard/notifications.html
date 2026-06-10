@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}Bildirimlerim — StayFinder{% endblock %}
+
+{% block content %}
+<div class="page-header" style="text-align: left; background: var(--bg-card); padding-bottom: var(--space-8);">
+    <div class="container" style="display: flex; align-items: center; gap: var(--space-6);">
+        <div style="width: 80px; height: 80px; border-radius: 50%; overflow: hidden; border: 2px solid var(--primary);">
+            <img src="{{ current_user.avatar_url }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <div>
+            <h1>Bildirimleriniz</h1>
+            <p>StayFinder üzerindeki son etkinlikler ve güncellemeler.</p>
+        </div>
+    </div>
+</div>
+
+<section class="section" style="padding-top: var(--space-8);">
+    <div class="container" style="display: grid; grid-template-columns: 250px 1fr; gap: var(--space-8);">
+        
+        <!-- Sidebar -->
+        <aside style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: var(--space-4); height: fit-content;">
+            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-2);">
+                <li>
+                    <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline" style="width: 100%; justify-content: flex-start; text-align: left; border: none;">
+                        Profilim
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('dashboard.profile_edit') }}" class="btn btn-outline" style="width: 100%; justify-content: flex-start; text-align: left; border: none;">
+                        Profili Düzenle
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('dashboard.change_password') }}" class="btn btn-outline" style="width: 100%; justify-content: flex-start; text-align: left; border: none;">
+                        Şifre Değiştir
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('dashboard.reservations') }}" class="btn btn-outline" style="width: 100%; justify-content: flex-start; text-align: left; border: none;">
+                        Rezervasyonlarım
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('notification.list_notifications') }}" class="btn btn-primary" style="width: 100%; justify-content: flex-start; text-align: left;">
+                        Bildirimlerim
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- İçerik -->
+        <div style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: var(--space-8);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
+                <h2 style="margin: 0;">Bildirimler</h2>
+                {% if notifications %}
+                <form action="{{ url_for('notification.mark_all_read') }}" method="POST" style="margin: 0;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-outline btn-sm">Tümünü Okundu İşaretle</button>
+                </form>
+                {% endif %}
+            </div>
+            
+            {% if not notifications %}
+            <div style="text-align: center; padding: var(--space-12) 0;">
+                <span style="font-size: 48px;">📭</span>
+                <h3 style="margin-top: var(--space-4); color: var(--text-muted);">Henüz bir bildiriminiz yok</h3>
+                <p style="color: var(--text-muted); font-size: var(--font-sm);">Yeni etkinlikler gerçekleştiğinde burada listelenecektir.</p>
+            </div>
+            {% else %}
+            <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+                {% for notification in notifications %}
+                <div class="notification-item {% if not notification.is_read %}unread{% endif %}" 
+                     data-id="{{ notification.id }}"
+                     style="display: flex; align-items: start; gap: var(--space-4); padding: var(--space-4); border: 1px solid var(--border); border-radius: var(--radius); transition: all 0.2s ease; {% if not notification.is_read %}background: rgba(99, 102, 241, 0.03); border-left: 4px solid var(--primary);{% endif %}">
+                    
+                    <div style="font-size: 24px; line-height: 1;">
+                        {% if notification.type == 'success' %}
+                            ✅
+                        {% elif notification.type == 'warning' %}
+                            ⚠️
+                        {% elif notification.type == 'danger' %}
+                            🚨
+                        {% else %}
+                            ℹ️
+                        {% endif %}
+                    </div>
+                    
+                    <div style="flex: 1;">
+                        <p style="margin: 0; font-size: var(--font-md); color: var(--text); font-weight: {% if not notification.is_read %}600{% else %}400{% endif %};">
+                            {{ notification.message }}
+                        </p>
+                        <span style="font-size: var(--font-xs); color: var(--text-muted); display: block; margin-top: var(--space-1);">
+                            {{ notification.created_at.strftime('%d.%m.%Y %H:%M') }}
+                        </span>
+                        {% if notification.link %}
+                        <a href="{{ notification.link }}" class="mark-read-btn" data-id="{{ notification.id }}" style="display: inline-block; font-size: var(--font-xs); color: var(--primary); font-weight: 500; margin-top: var(--space-2); text-decoration: none;">Detayları Gör &rarr;</a>
+                        {% endif %}
+                    </div>
+                    
+                    {% if not notification.is_read %}
+                    <button class="mark-single-read" data-id="{{ notification.id }}" 
+                            style="background: none; border: none; color: var(--primary); font-size: var(--font-xs); cursor: pointer; font-weight: 500;"
+                            title="Okundu olarak işaretle">
+                        Okundu
+                    </button>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const csrfToken = "{{ csrf_token() }}";
+    
+    // Tek bir bildirimi okundu olarak işaretleme
+    document.querySelectorAll('.mark-single-read, .mark-read-btn').forEach(element => {
+        element.addEventListener('click', function(e) {
+            const notificationId = this.getAttribute('data-id');
+            const item = document.querySelector(`.notification-item[data-id="${notificationId}"]`);
+            
+            fetch(`/notifications/${notificationId}/read`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (item) {
+                        item.style.background = 'none';
+                        item.style.borderLeft = '1px solid var(--border)';
+                        item.style.paddingLeft = 'var(--space-4)';
+                        const title = item.querySelector('p');
+                        if (title) title.style.fontWeight = '400';
+                        const btn = item.querySelector('.mark-single-read');
+                        if (btn) btn.remove();
+                    }
+                    
+                    // Navbar'daki badge sayısını güncelle
+                    const badge = document.querySelector('.nav-link span[style*="background: #ff4757"]');
+                    if (badge) {
+                        let currentCount = parseInt(badge.textContent);
+                        if (currentCount > 1) {
+                            badge.textContent = currentCount - 1;
+                        } else {
+                            badge.remove();
+                        }
+                    }
+                }
+            })
+            .catch(err => console.error('Hata:', err));
+        });
+    });
+});
+</script>
+{% endblock %}

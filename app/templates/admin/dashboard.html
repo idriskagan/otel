@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Paneli — StayFinder{% endblock %}
+
+{% block content %}
+<div class="page-header" style="text-align: left; background: var(--bg-card); padding-bottom: var(--space-8);">
+    <div class="container">
+        <h1>Admin Paneli</h1>
+        <p>Sistem genelindeki istatistikleri ve yönetimi buradan sağlayabilirsiniz.</p>
+    </div>
+</div>
+
+<section class="section" style="padding-top: var(--space-8);">
+    <div class="container" style="display: grid; grid-template-columns: 250px 1fr; gap: var(--space-8);">
+        
+        <!-- Sidebar -->
+        <aside style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: var(--space-4); height: fit-content;">
+            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-2);">
+                <li>
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary" style="width: 100%; justify-content: flex-start; text-align: left;">
+                        Gösterge Paneli
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin.hotels') }}" class="btn btn-outline" style="width: 100%; justify-content: flex-start; text-align: left; border: none;">
+                        Otel Yönetimi
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin.users') }}" class="btn btn-outline" style="width: 100%; justify-content: flex-start; text-align: left; border: none;">
+                        Kullanıcı Yönetimi
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- İçerik -->
+        <div>
+            <h2 style="margin-bottom: var(--space-6);">Genel İstatistikler</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6); margin-bottom: var(--space-8);">
+                <div style="background: var(--bg-card); border: 1px solid var(--border); padding: var(--space-6); border-radius: var(--radius-lg); text-align: center;">
+                    <div style="font-size: var(--font-4xl); font-weight: bold; color: var(--primary-light); margin-bottom: var(--space-2);">{{ stats.total_users }}</div>
+                    <div style="color: var(--text-muted); text-transform: uppercase; font-size: var(--font-sm); font-weight: 600;">Kayıtlı Kullanıcı</div>
+                </div>
+                
+                <div style="background: var(--bg-card); border: 1px solid var(--border); padding: var(--space-6); border-radius: var(--radius-lg); text-align: center;">
+                    <div style="font-size: var(--font-4xl); font-weight: bold; color: var(--accent); margin-bottom: var(--space-2);">{{ stats.total_hotels }}</div>
+                    <div style="color: var(--text-muted); text-transform: uppercase; font-size: var(--font-sm); font-weight: 600;">Toplam Otel</div>
+                </div>
+                
+                <div style="background: var(--bg-card); border: 1px solid var(--border); padding: var(--space-6); border-radius: var(--radius-lg); text-align: center;">
+                    <div style="font-size: var(--font-4xl); font-weight: bold; color: var(--success); margin-bottom: var(--space-2);">{{ stats.total_reservations }}</div>
+                    <div style="color: var(--text-muted); text-transform: uppercase; font-size: var(--font-sm); font-weight: 600;">Rezervasyon İşlemi</div>
+                </div>
+            </div>
+            
+            <div style="padding: var(--space-8); background: rgba(15, 23, 42, 0.5); border-radius: var(--radius-lg); text-align: center;">
+                <p style="color: var(--text-muted);">Sistem operasyonlarını yandaki menüden yönetebilirsiniz.</p>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
